@@ -8,7 +8,6 @@
         :event-sources="eventSources"
       />
     </div>
-    <b-button @click="click">click</b-button>
   </div>
 </template>
 
@@ -17,7 +16,6 @@
 import FullCalendar from '@fullcalendar/vue'
 import dayGridPlugin from '@fullcalendar/daygrid'
 import googleCalendarPlugin from '@fullcalendar/google-calendar'
-import axios from 'axios'
 
 export default {
   name: 'Home',
@@ -33,54 +31,33 @@ export default {
       eventSources: [
         {
           googleCalendarId: process.env.VUE_APP_CALENDAR_ID,
-          // googleCalendarId: process.env.VUE_APP_CALENDAR_ID,
-          //todo: ここらへんで予定を取得してるのでいじる
-          success: function(e) {
-            console.log(e)
-            // let days = document.getElementsByClassName('fc-day-top')
-            // e.forEach(el => {
-            //   console.log(el)
-            //   // for (let i = 0; i < days.length; i++) {
-            //   //   let day = days[i]
-            //   //   if (el.start === day.dataset.date) {
-            //   //     day.classList.add('is_holiday')
-            //   //   }
-            //   // }
-            // })
-          }
         },
         {
+          //祝日を取得
           googleCalendarId: 'japanese__ja@holiday.calendar.google.com',
           success: function(e) {
-            console.log(e)
-            let days = document.getElementsByClassName('fc-day-top');
+            let days = document.getElementsByClassName('fc-day-top')
+            // let srcs = document.getElementsByClassName('fc-event-container')
 
             e.forEach(el => {
               for(let i=0; i<days.length; i++) {
                 let day = days[i]
-                console.log(day)
                 if (el.start === day.dataset.date) {
                   day.classList.add('is_holiday')
                 }
+
+                console.log(el)
               }
 
-            });
+            })
+
+            
           }
         },
       ]
     }
   },
   methods: {
-    click() {
-      console.log('clicked')
-      axios.get('https://www.googleapis.com/calendar/v3/calendars/tomofumi.kondo.r1%40dc.tohoku.ac.jp?key=AIzaSyDSXtHq8PmXCRRrb6a9RyfxPTB-nKWA1z4')
-        .then(res => {
-          console.log(res)
-        })
-        .catch(e => {
-          console.log(e)
-        })
-    }
   }
 }
 </script>
@@ -96,6 +73,12 @@ export default {
 
     .fc-scroller {
       min-height: 384px;
+
+      .is_holiday {
+        .fc-day-number {
+          color: rgb(255, 84, 84);
+        }
+      }
     }
   }
 </style>
