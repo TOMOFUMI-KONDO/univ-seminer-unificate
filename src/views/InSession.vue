@@ -1,14 +1,13 @@
 <template>
-  <div class="home">
+  <div class="in-session">
     <img alt="Vue logo" src="../assets/img/logo.png">
   </div>
 </template>
 
 <script>
-// @ is an alias to /src
 
 export default {
-  name: 'Home',
+  name: 'InSession',
   components: {
   }
 }

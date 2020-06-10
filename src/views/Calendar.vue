@@ -12,13 +12,12 @@
 </template>
 
 <script>
-// @ is an alias to /src
 import FullCalendar from '@fullcalendar/vue'
 import dayGridPlugin from '@fullcalendar/daygrid'
 import googleCalendarPlugin from '@fullcalendar/google-calendar'
 
 export default {
-  name: 'Home',
+  name: 'Calendar',
   components: {
     FullCalendar
   },
@@ -35,23 +34,17 @@ export default {
         {
           //祝日を取得
           googleCalendarId: 'japanese__ja@holiday.calendar.google.com',
-          success: function(e) {
-            let days = document.getElementsByClassName('fc-day-top')
-            // let srcs = document.getElementsByClassName('fc-event-container')
+          success: function(events) {
+            let dayTops = document.getElementsByClassName('fc-day-top')
 
-            e.forEach(el => {
-              for(let i=0; i<days.length; i++) {
-                let day = days[i]
-                if (el.start === day.dataset.date) {
-                  day.classList.add('is_holiday')
+            events.forEach(event => {
+              for(let i=0; i < dayTops.length; i++) {
+                let dayTop = dayTops[i]
+                if (event.start === dayTop.dataset.date) {
+                  dayTop.classList.add('is_holiday')
                 }
-
-                console.log(el)
               }
-
             })
-
-            
           }
         },
       ]

@@ -1,26 +1,36 @@
 <template>
   <div id="app">
     <Header />
-    <router-view/>
+    <router-view class="main"/>
+    <Loading class="loading" />
     <Footer />
   </div>
 </template>
 
 <script>
-  import Header from "./components/Header";
+  import Header from "./components/Header"
   import Footer from "./components/Footer"
+  import Loading from "./components/Loading"
   export default {
-    components: {Header, Footer}
+    components: {Header, Footer, Loading},
   }
-
 </script>
 
 <style lang="scss">
+  html, body {
+    height: 100%;
+  }
+
   #app {
+    height: 100%;
+    text-align: center;
+    color: #2c3e50;
     font-family: Avenir, Helvetica, Arial, sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    text-align: center;
-    color: #2c3e50;
+
+    .main, .loading {
+      min-height: 80%;
+    }
   }
 </style>
