@@ -34,6 +34,8 @@ export default {
         {
           //祝日を取得
           googleCalendarId: 'japanese__ja@holiday.calendar.google.com',
+          className: 'is_holiday',
+          description: '祝日だよ',
           success: function(events) {
             let dayTops = document.getElementsByClassName('fc-day-top')
 
@@ -67,9 +69,26 @@ export default {
     .fc-scroller {
       min-height: 384px;
 
-      .is_holiday {
-        .fc-day-number {
-          color: rgb(255, 84, 84);
+      .fc-content-skeleton {
+        thead {
+          .is_holiday {
+            .fc-day-number {
+              color: rgb(255, 84, 84);
+            }
+          }
+
+          .fc-sun {
+            .fc-day-number {
+              color: rgb(255, 84, 84);
+            }
+          }
+        }
+
+        tbody {
+          .is_holiday {
+            border-color: rgb(255, 84, 84);
+            background-color: rgb(255, 84, 84);
+          }
         }
       }
     }
