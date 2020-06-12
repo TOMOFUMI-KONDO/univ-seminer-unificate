@@ -1,17 +1,20 @@
 <template>
   <div class="sign-in">
     <div class="button-wrapper">
-      <p>tohoku.ac.jpのアカウントをお持ちの方</p>
-      <b-button block variant="primary" @click="googleSignIn('tohoku')" class="button">サインイン</b-button>
+      <b-button block variant="info" @click="googleSignIn('tohoku')" class="sign-in d-flex justify-content-around align-items-center py-3">
+        <img src="../assets/img/google.jpg" width="50" height="50" alt="googleのロゴ"/>
+        <p class="mb-0">東北大アカウントで<br class="d-sm-none" />サインイン</p>
+      </b-button>
     </div>
-    <div class="button-wrapper w-50 mx-auto">
-      <p>or</p>
-      <div class="d-flex justify-content-center">
-        <b-button block variant="secondary" @click="googleSignIn('ecei')" class="button">ecei.ac.jpでサインイン</b-button>
-        <b-button block variant="secondary" @click="googleSignIn('riec')" class="button">riec.ac.jpでサインイン</b-button>
-      </div>
-    </div>
-    <b-alert v-if="isError" dismissible variant="danger">{{errorMessage}}</b-alert>
+    <b-alert v-if="isError" dismissible variant="danger" class="mt-2">{{errorMessage}}</b-alert>
+    <b-dd block variant="outline-secondary" text="東北大アカウントとは？" class="button-wrapper">
+      <b-dd-text class="dd-item">
+        東北大アカウントは、<br/>
+        <span class="d-block pt-3">@tohoku.ac.jp(教職員用)</span>
+        <span class="d-block pb-3">@dc.tohoku.ac.jp(学生用)</span>
+        などのドメインを持つGoogleアカウントです。
+      </b-dd-text>
+    </b-dd>
   </div>
 </template>
 
@@ -36,25 +39,16 @@
 
 <style lang="scss">
   .button-wrapper {
-    &:first-of-type {
-      margin-bottom: 100px;
+    width: 90%;
+    max-width: 500px;
+    margin: 100px auto 0 auto;
 
-      p, button {
-        font-size: 24px;
-      }
+    .sign-in {
+      font-size: 24px;
     }
 
-    &:not(:first-of-type) {
-      p {
-        font-size: 20px;
-      }
-    }
-
-    .button {
-      width: 80%;
-      max-width: 250px;
-      margin: 0 auto;
-      padding: 10px 0;
+    .dropdown-menu {
+      width: 100%;
     }
   }
 </style>
