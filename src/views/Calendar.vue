@@ -1,6 +1,7 @@
 <template>
   <div class="calendar">
     <div id="calendar" class="calender-wrapper">
+      <p class="text-left indent pb-3">※イベントをクリックしてGoogleカレンダーへ移動し、そこでイベントを複製すれば自分のカレンダーにイベントを追加できます。</p>
       <FullCalendar
         default-view="dayGridMonth"
         :plugins="calendarPlugins"
@@ -65,6 +66,11 @@ export default {
     width: 90%;
     max-width: 700px;
     margin: 0 auto;
+
+    .indent {
+      padding-left: 1em;
+      text-indent: -1em;
+    }
 
     .fc-scroller {
       min-height: 384px;

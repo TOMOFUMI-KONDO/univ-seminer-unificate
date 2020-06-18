@@ -1,7 +1,18 @@
 <template>
   <div class="in-session px-lg-5 px-4">
-    <b-card-group deck>
-      <Event :event-data="event" v-for="(event, index) in eventData" :key="index"/>
+<!--    todo: 各学部のイベントページのリンクが張ってあるページを1つ用意してそっちに移行する-->
+<!--    <p class="mb-4 text-left">東北大学のイベントページは-->
+<!--      <a href="https://www.tohoku.ac.jp/japanese/2020/cate_event/" target="_blank">こちら</a>-->
+<!--    </p>-->
+    <div class="d-flex justify-content-between align-items-start  flex-column flex-sm-row">
+      <p class="text-left indent pb-3">※イベントのタイトル部分をクリックしてGoogleカレンダーへ移動し、そこでイベントを複製すれば自分のカレンダーにイベントを追加できます。</p>
+      <div>
+        <input class="mr-1 checkbox" type="checkbox" id="display_current" v-model="displayCurrent" />
+        <label for="display_current">開催中のイベントのみ表示</label>
+      </div>
+    </div>
+    <b-card-group deck :class="this.displayCurrent ? 'show_current' : ''">
+      <Event :class="isCurrent(index)" :event-data="event" v-for="(event, index) in eventData" :key="index"/>
     </b-card-group>
   </div>
 </template>
@@ -15,11 +26,13 @@
     components: { Event },
     data() {
       return {
-        now: {},
-        eventData: [],
+        now: {}, //現在の時刻情報
+        eventData: [], //全てのイベントデータ
+        inSessionEvents: [], //開催中のイベントのインデックス
         calendarUrl: 'https://www.googleapis.com/calendar/v3/calendars/',
         calendarId: process.env.VUE_APP_CALENDAR_ID,
         apiKey: process.env.VUE_APP_CALENDAR_API_KEY,
+        displayCurrent: true,
       }
     },
     methods: {
@@ -42,15 +55,21 @@
           let items = response.result.items
           for (let i=0; i < items.length; i++) {
             let item = items[i]
-            let start = this.getTimeInfo(item.start.dateTime)
-            let end = this.getTimeInfo(item.end.dateTime)
-            console.log(item.summary)
-            console.log(`${start.year} ${start.month} ${start.day} ${start.hour} ${start.minute}`)
-            console.log(`${end.year} ${end.month} ${end.day} ${end.hour} ${end.minute}`)
+            let start
+            let end
+            //終日イベントの場合はdateTimeでなくてdateプロパティを保持してる
+            if ('dateTime' in item.start) {
+              start = this.getTimeInfo(item.start.dateTime)
+              end = this.getTimeInfo(item.end.dateTime)
+            } else {
+              start = this.getTimeInfo(item.start.date)
+              end = this.getTimeInfo(item.end.date)
+            }
 
             if (this.isInSession(start, end)) {
-              this.eventData.push(item)
+              this.inSessionEvents.push(i)
             }
+            this.eventData.push(item)
           }
         }).catch(e => {
           console.log(e)
@@ -68,6 +87,11 @@
         if (start.day > now.day || end.day < now.day) {
           return false
         }
+        //終日イベントならここでtrueを返す
+        if (start.hour === 0 && end.hour === 0) {
+          return true
+        }
+
         if (start.hour > now.hour || end.hour < now.hour) {
           return false
         }
@@ -99,12 +123,36 @@
             'minute': parseInt(moment(dateTime).format('mm')),
           }
         }
+      },
+      isCurrent(index) {
+        if (index in this.inSessionEvents) {
+          return 'current'
+        }
+        else {
+          return ''
+        }
       }
     },
     created() {
       this.now = this.getTimeInfo()
-      console.log(this.now)
       this.load()
-    }
+    },
   }
 </script>
+
+<style scoped lang="scss">
+  .indent {
+    padding-left: 1em;
+    text-indent: -1em;
+  }
+
+  .checkbox {
+    transform: scale(1.3);
+  }
+
+  .show_current {
+    > :not(.current) {
+      display: none;
+    }
+  }
+</style>
