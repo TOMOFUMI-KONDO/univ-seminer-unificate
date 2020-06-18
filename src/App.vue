@@ -33,4 +33,10 @@
       min-height: 80%;
     }
   }
+
+  .tooltip-inner {
+    @media (min-width: 1181px) {
+      max-width: 300px !important;
+    }
+  }
 </style>

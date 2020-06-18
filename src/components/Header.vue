@@ -5,7 +5,7 @@
       <b-navbar-toggle target="nav-collapse" class="border-0"/>
       <b-collapse id="nav-collapse" class="flex-grow-0" is-nav>
         <router-link to="/">イベントカレンダー</router-link>
-        <router-link to="/in-session">開催中のイベント</router-link>
+        <router-link to="/in-session">イベント詳細</router-link>
         <auth/>
       </b-collapse>
     </b-navbar>

@@ -1,12 +1,16 @@
 <template>
-<!--    todo:レイアウトしづらいから、bootstrap vueの独自要素使わないで普通にcssでスタイル調整した方いいかも-->
-    <b-card header-bg-variant="info" header-text-variant="light" :header="this.summary" class="event mb-5 font-weight-bold">
-        <b-list-group class="font-weight-normal">
-            <b-list-group-item><p class="mb-0">{{this.date}}</p></b-list-group-item>
-<!--            todo:URLをaタグで囲うようにする？セキュリティの問題気にしながら-->
-            <b-list-group-item><p class="mb-0">{{this.description}}</p></b-list-group-item>
-        </b-list-group>
-    </b-card>
+    <div class="card event mb-5 mx-15px">
+        <p v-b-tooltip="this.summary" class="card-header bg-info font-weight-bold">
+            <a :href="this.html_link" class="text-light" target="_blank">{{this.short_summary}}</a>
+        </p>
+            <div class="card-body">
+            <b-list-group class="font-weight-normal text-left">
+                <small class="pb-3"><u>{{this.date}}{{this.time}}</u></small>
+    <!--            todo:URLをaタグで囲うようにする？セキュリティは？-->
+                <p class="mb-0">{{this.description}}</p>
+            </b-list-group>
+            </div>
+    </div>
 </template>
 
 <script>
@@ -17,19 +21,49 @@
         data() {
             return {
                 summary: '',
+                short_summary: '',
+                max_summary: 15, //タイトルの文字数上限。一行に収まるように。
                 description: '',
+                max_description: 100, //説明文の文字数上限
                 date: '',
+                time: '',
+                html_link: '',
             }
         },
         methods: {
             setValue(val) {
-                this.summary = val.summary
-                this.description = val.description
-                this.date = this.getDate(val.start.dateTime)
+                this.summary = val.summary //tooltipで表示するように元のタイトルを取っておく
+                if (val.summary.length > this.max_summary) {
+                    this.short_summary = val.summary.substring(0,this.max_summary) + '...'
+                }
+                else {
+                    this.short_summary = val.summary
+                }
+
+                this.description = val.description.substring(0,this.max_description)
+
+                if ('dateTime' in val.start) {
+                    let dateTime = val.start.dateTime
+                    this.date = this.getDate(dateTime)
+                    this.time = this.getTime(dateTime)
+                }
+                //終日イベントの場合
+                else {
+                    let date = val.start.date
+                    this.date = this.getDate(date)
+                }
+
+                this.html_link = val.htmlLink
             },
             getDate(datetime) {
-                return moment(datetime).format('YYYY/MM/DD　HH:mm~')
-            }
+                return moment(datetime).format('YYYY/MM/DD')
+            },
+            getTime(datetime) {
+                return moment(datetime).format('　HH:mm~')
+            },
+            // modifySummary(summary) {
+            //     //東北大のHPからとってきたデータに
+            // }
         },
         created() {
             this.setValue(this.eventData)
@@ -39,6 +73,12 @@
 
 <style scoped lang="scss">
     .event {
-        flex: 0 30%;
+        @media (min-width: 576px) {
+            flex: 0 45%;
+        }
+
+        @media (min-width: 918px) {
+            flex: 0 30%;
+        }
     }
 </style>
