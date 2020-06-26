@@ -32,7 +32,7 @@
         calendarUrl: 'https://www.googleapis.com/calendar/v3/calendars/',
         calendarId: process.env.VUE_APP_CALENDAR_ID,
         apiKey: process.env.VUE_APP_CALENDAR_API_KEY,
-        displayCurrent: true,
+        displayCurrent: false,
       }
     },
     methods: {
