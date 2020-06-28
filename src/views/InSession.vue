@@ -12,7 +12,7 @@
       </div>
     </div>
     <b-card-group deck :class="this.displayCurrent ? 'show_current' : ''">
-      <Event :class="isCurrent(index)" :event-data="event" v-for="(event, index) in eventData" :key="index"/>
+      <Event :class="isCurrent(index)" :event-data="event" v-for="(event, index) in eventData" :key="event.summary"/>
     </b-card-group>
   </div>
 </template>
@@ -125,7 +125,7 @@
         }
       },
       isCurrent(index) {
-        if (index in this.inSessionEvents) {
+        if (this.inSessionEvents.includes(index)) {
           return 'current'
         }
         else {
