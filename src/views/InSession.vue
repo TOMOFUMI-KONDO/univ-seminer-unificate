@@ -12,7 +12,7 @@
       </div>
     </div>
     <b-card-group deck :class="this.displayCurrent ? 'show_current' : ''">
-      <Event :class="isCurrent(index)" :event-data="event" v-for="(event, index) in eventData" :key="index"/>
+      <Event :class="isCurrent(index)" :event-data="event" v-for="(event, index) in eventData" :key="event.summary"/>
     </b-card-group>
   </div>
 </template>
@@ -32,7 +32,7 @@
         calendarUrl: 'https://www.googleapis.com/calendar/v3/calendars/',
         calendarId: process.env.VUE_APP_CALENDAR_ID,
         apiKey: process.env.VUE_APP_CALENDAR_API_KEY,
-        displayCurrent: true,
+        displayCurrent: false,
       }
     },
     methods: {
@@ -125,7 +125,7 @@
         }
       },
       isCurrent(index) {
-        if (index in this.inSessionEvents) {
+        if (this.inSessionEvents.includes(index)) {
           return 'current'
         }
         else {
