@@ -1,9 +1,0 @@
-.vscode
-bin
-include
-lib
-lib64
-__pycache__
-pip-selfcheck.json
-pyvenv.cfg
-univ-seminer-unificate-9b2952dae41e.json
