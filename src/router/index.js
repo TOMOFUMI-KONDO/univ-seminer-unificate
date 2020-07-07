@@ -1,18 +1,18 @@
-import Vue from 'vue'
-import VueRouter from 'vue-router'
-import firebase from 'firebase/app'
-import 'firebase/auth'
-import { setTitle } from '../mixins'
+import Vue from "vue";
+import VueRouter from "vue-router";
+import firebase from "firebase/app";
+import "firebase/auth";
+import { setTitle } from "../mixins";
 import store from "../store";
 
-Vue.use(VueRouter)
+Vue.use(VueRouter);
 
 const routes = [
   {
-    path: '/',
-    name: 'Calendar',
-    component: () => import('../views/Calendar'),
-    meta: {title: 'イベントカレンダー'}
+    path: "/",
+    name: "Calendar",
+    component: () => import("../views/Calendar"),
+    meta: { title: "イベントカレンダー" },
   },
   {
     path: '/in-session',
@@ -24,43 +24,43 @@ const routes = [
     meta: {title: '開催中のイベント'}
   },
   {
-    path: '/sign-in',
-    name: 'SignIn',
-    component: () => import('../views/SignIn'),
-    meta: {title: 'サインイン'}
+    path: "/sign-in",
+    name: "SignIn",
+    component: () => import("../views/SignIn"),
+    meta: { title: "サインイン" },
   },
   {
-    path: '*',
-    redirect: '/sign-in'
+    path: "*",
+    redirect: "/sign-in",
   },
-]
+];
 
 const router = new VueRouter({
-  mode: 'history',
+  mode: "history",
   base: process.env.BASE_URL,
-  routes
-})
+  routes,
+});
 
 //ログインしていなかったら'/sign-in'にリダイレクトする
 router.beforeResolve((to, from, next) => {
-  store.commit('onLoadingStateChanged', true);
+  store.commit("onLoadingStateChanged", true);
 
-  if (to.path === '/sign-in') {
-    setTitle(to.meta.title) //タイトルを動的に設定
-    next()
-    store.commit('onLoadingStateChanged', false);
+  if (to.path === "/sign-in") {
+    setTitle(to.meta.title); //タイトルを動的に設定
+    next();
+    store.commit("onLoadingStateChanged", false);
   } else {
-    firebase.auth().onAuthStateChanged(user => {
+    firebase.auth().onAuthStateChanged((user) => {
       if (user) {
-        setTitle(to.meta.title) //タイトルを動的に設定
-        next()
-        store.commit('onLoadingStateChanged', false);
+        setTitle(to.meta.title); //タイトルを動的に設定
+        next();
+        store.commit("onLoadingStateChanged", false);
       } else {
-        next({path: '/sign-in'})
-        store.commit('onLoadingStateChanged', false);
+        next({ path: "/sign-in" });
+        store.commit("onLoadingStateChanged", false);
       }
-    })
+    });
   }
-})
+});
 
-export default router
+export default router;

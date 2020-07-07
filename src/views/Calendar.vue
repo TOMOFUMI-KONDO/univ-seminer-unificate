@@ -13,20 +13,18 @@
 </template>
 
 <script>
-import FullCalendar from '@fullcalendar/vue'
-import dayGridPlugin from '@fullcalendar/daygrid'
-import googleCalendarPlugin from '@fullcalendar/google-calendar'
+import FullCalendar from "@fullcalendar/vue";
+import dayGridPlugin from "@fullcalendar/daygrid";
+import googleCalendarPlugin from "@fullcalendar/google-calendar";
 
 export default {
-  name: 'Calendar',
+  name: "Calendar",
   components: {
-    FullCalendar
+    FullCalendar,
   },
   data() {
     return {
-      calendarPlugins: [
-              dayGridPlugin, googleCalendarPlugin
-      ],
+      calendarPlugins: [dayGridPlugin, googleCalendarPlugin],
       googleCalendarApiKey: process.env.VUE_APP_CALENDAR_API_KEY,
       eventSources: [
         {
@@ -34,15 +32,15 @@ export default {
         },
         {
           //祝日を取得
-          googleCalendarId: 'japanese__ja@holiday.calendar.google.com',
-          className: 'is_holiday',
-          description: '祝日だよ',
-          success: function(events) {
-            let dayTops = document.getElementsByClassName('fc-day-top')
+          googleCalendarId: "japanese__ja@holiday.calendar.google.com",
+          className: "is_holiday",
+          description: "祝日だよ",
+          success: function (events) {
+            let dayTops = document.getElementsByClassName("fc-day-top");
 
-            events.forEach(event => {
-              for(let i=0; i < dayTops.length; i++) {
-                let dayTop = dayTops[i]
+            events.forEach((event) => {
+              for (let i = 0; i < dayTops.length; i++) {
+                let dayTop = dayTops[i];
                 if (event.start === dayTop.dataset.date) {
                   dayTop.classList.add('is_holiday')
                 }
@@ -59,44 +57,44 @@ export default {
 </script>
 
 <style lang="scss">
-  @import '~@fullcalendar/core/main.css';
-  @import '~@fullcalendar/daygrid/main.css';
+@import "~@fullcalendar/core/main.css";
+@import "~@fullcalendar/daygrid/main.css";
 
-  .calender-wrapper {
-    width: 90%;
-    max-width: 700px;
-    margin: 0 auto;
+.calender-wrapper {
+  width: 90%;
+  max-width: 700px;
+  margin: 0 auto;
 
-    .indent {
-      padding-left: 1em;
-      text-indent: -1em;
-    }
+  .indent {
+    padding-left: 1em;
+    text-indent: -1em;
+  }
 
-    .fc-scroller {
-      min-height: 384px;
+  .fc-scroller {
+    min-height: 384px;
 
-      .fc-content-skeleton {
-        thead {
-          .is_holiday {
-            .fc-day-number {
-              color: rgb(255, 84, 84);
-            }
-          }
-
-          .fc-sun {
-            .fc-day-number {
-              color: rgb(255, 84, 84);
-            }
+    .fc-content-skeleton {
+      thead {
+        .is_holiday {
+          .fc-day-number {
+            color: rgb(255, 84, 84);
           }
         }
 
-        tbody {
-          .is_holiday {
-            border-color: rgb(255, 84, 84);
-            background-color: rgb(255, 84, 84);
+        .fc-sun {
+          .fc-day-number {
+            color: rgb(255, 84, 84);
           }
+        }
+      }
+
+      tbody {
+        .is_holiday {
+          border-color: rgb(255, 84, 84);
+          background-color: rgb(255, 84, 84);
         }
       }
     }
   }
+}
 </style>
