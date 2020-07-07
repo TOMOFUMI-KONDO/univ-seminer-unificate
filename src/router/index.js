@@ -15,13 +15,11 @@ const routes = [
     meta: { title: "イベントカレンダー" },
   },
   {
-    path: '/in-session',
-    name: 'InSession',
-    // route level code-splitting
-    // this generates a separate chunk (about.[hash].js) for this route
-    // which is lazy-loaded when the route is visited.
-    component: () => import(/* webpackChunkName: "about" */ '../views/InSession'),
-    meta: {title: '開催中のイベント'}
+    path: "/in-session/",
+    name: "InSession",
+    component: () => import("../views/InSession"),
+    meta: { title: "開催中のイベント" },
+    props: true, //InSessionコンポーネントにrouterからpropsを渡すことを許可
   },
   {
     path: "/sign-in",
