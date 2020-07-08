@@ -11,7 +11,7 @@
           ><u>{{ this.date }}{{ this.time }}</u></small
         >
         <!--            todo:URLをaタグで囲うようにする？セキュリティは？-->
-        <p class="mb-0">{{ this.description }}</p>
+        <p v-html="description" class="mb-0"></p>
       </b-list-group>
     </div>
   </div>
@@ -37,13 +37,20 @@ export default {
   methods: {
     setValue(val) {
       this.summary = val.summary; //tooltipで表示するように元のタイトルを取っておく
+      //タイトルがthis.max_summaryの値より長かったら途中で切る。
       if (val.summary.length > this.max_summary) {
         this.short_summary = val.summary.substring(0, this.max_summary) + "...";
       } else {
         this.short_summary = val.summary;
       }
 
-      this.description = val.description.substring(0, this.max_description);
+      //文字数が150文字より多ければ切り取る。
+      let description = val.description.substring(0, this.max_description);
+      //urlをaタグに変更
+      this.description = description.replace(
+        /(http(s)?:\/\/[-_.!~*'()a-zA-Z0-9;/?:@&=+$,%#]+)/,
+        '<a href="$1" target="_blank">$1</a>'
+      );
 
       if ("dateTime" in val.start) {
         let dateTime = val.start.dateTime;

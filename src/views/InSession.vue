@@ -8,7 +8,7 @@
       class="d-flex justify-content-between align-items-start flex-column flex-sm-row"
     >
       <p class="text-left indent pb-3">
-        ※イベントのタイトル部分をクリックしてGoogleカレンダーへ移動し、そこでイベントを複製すれば自分のカレンダーにイベントを追加できます。
+        ※イベントの<b>タイトル部分</b>をクリックしてGoogleカレンダーへ移動し、そこでイベントを複製すれば自分のカレンダーにイベントを追加できます。
       </p>
       <div>
         <input
@@ -75,7 +75,9 @@ export default {
           });
         })
         .then((response) => {
-          let items = response.result.items;
+          const items = response.result.items;
+          let j = 0; //eventDataに保存したイベントの個数だけをカウントする変数
+
           for (let i = 0; i < items.length; i++) {
             let item = items[i];
             let start;
@@ -89,44 +91,76 @@ export default {
               end = this.getTimeInfo(item.end.date);
             }
 
-            if (this.isInSession(start, end)) {
-              this.inSessionEvents.push(i);
+            let event_time = this.getEventTime(start, end);
+            switch (event_time) {
+              //既に終わったイベントは表示しない
+              case "past":
+                break;
+
+              //開催中のイベントのインデックスを保存＆eventDataに追加
+              case "now":
+                this.inSessionEvents.push(j);
+                this.eventData.push(item);
+                j++;
+                break;
+
+              //これから開催するイベントをeventDataに追加
+              case "future":
+                this.eventData.push(item);
+                j++;
+                break;
+
+              //past, now, future以外の値が返ってきたとき
+              default:
+                console.log(
+                  "予期せぬエラー：getEventTimeが不正な値を返しました。"
+                );
+                break;
             }
-            this.eventData.push(item);
           }
         })
         .catch((e) => {
           console.log(e);
         });
     },
-    //イベントの開始時刻と終了時刻から、そのイベントが現在開催中かどうかを判定する
-    isInSession(start, end) {
+    //イベントの開始時刻と終了時刻を受け取り、イベントの開催状況（開催中・終わった  ・これから）を返す。
+    getEventTime(start, end) {
       let now = this.now;
-      if (start.year > now.year || end.year < now.year) {
-        return false;
-      }
-      if (start.month > now.month || end.month < now.month) {
-        return false;
-      }
-      if (start.day > now.day || end.day < now.day) {
-        return false;
-      }
-      //終日イベントならここでtrueを返す
+
+      //現在時刻の年月日を合成
+      let joinedNowYMD = this.getJoinedYMD(now.year, now.month, now.day);
+      //イベント開催時刻の年月日を合成
+      let joinedStartYMD = this.getJoinedYMD(
+        start.year,
+        start.month,
+        start.day
+      );
+      //イベント終了時刻の年月日を合成
+      let joinedEndYMD = this.getJoinedYMD(end.year, end.month, end.day);
+
+      //まだ開催されていないイベントの場合
+      if (joinedNowYMD - joinedStartYMD < 0) return "future";
+      //既に終わったイベントの場合
+      if (joinedEndYMD - joinedNowYMD < 0) return "past";
+
+      //全日イベントの場合は開始・終了時刻に0が入っている
       if (start.hour === 0 && end.hour === 0) {
-        return true;
+        return "now";
       }
 
-      if (start.hour > now.hour || end.hour < now.hour) {
-        return false;
-      }
+      //開始時間の時単位が同じ場合は分で判別
       if (start.hour === now.hour) {
-        return !(start.minute > now.minute);
-      }
-      if (end.hour === now.hour) {
-        return !(end.minute < now.minute);
+        return start.minute > now.minute ? "future" : "now";
       }
 
-      return true;
+      //終了時間の時単位が同じ場合は分で判別
+      if (end.hour === now.hour) {
+        return end.minute < now.minute ? "past" : "now";
+      }
+    },
+    //年月日を受け取り、桁を考慮して合成する関数
+    getJoinedYMD(year, month, day) {
+      return year * 10 ** 4 + month * 10 ** 2 + day;
     },
     //世界標準時を引数に取り、年月日などをキーにしたオブジェクトにして返す
     getTimeInfo(dateTime = null) {
