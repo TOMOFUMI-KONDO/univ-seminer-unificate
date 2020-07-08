@@ -8,7 +8,7 @@
       class="d-flex justify-content-between align-items-start flex-column flex-sm-row"
     >
       <p class="text-left indent pb-3">
-        ※イベントのタイトル部分をクリックしてGoogleカレンダーへ移動し、そこでイベントを複製すれば自分のカレンダーにイベントを追加できます。
+        ※イベントの<b>タイトル部分</b>をクリックしてGoogleカレンダーへ移動し、そこでイベントを複製すれば自分のカレンダーにイベントを追加できます。
       </p>
       <div>
         <input
