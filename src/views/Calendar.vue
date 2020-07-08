@@ -126,9 +126,6 @@ export default {
     },
   },
   mounted() {
-    //note: レンダリング直後だとカレンダーのイベントがまだDOMに存在していない（多分非同期で取ってきてる）ため、setTimeoutで調整
-    //note: 余裕をもって3秒でしているが、1秒くらいでも大丈夫なはず。
-    //note: 適当に時間を置いて実行するのではなく、イベントがレンダーされたときに実行するようにしたかったが難しかったので断念。
     const self = this;
     const preventClick = (e) => e.preventDefault();
 
