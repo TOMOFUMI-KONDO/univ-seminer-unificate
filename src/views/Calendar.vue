@@ -197,25 +197,73 @@ export default {
   .fc-scroller {
     min-height: 384px;
 
-    .fc-content-skeleton {
-      thead {
-        .is_holiday {
-          .fc-day-number {
-            color: rgb(255, 84, 84);
+    .fc-week {
+      .fc-content-skeleton {
+        thead {
+          .is_holiday {
+            .fc-day-number {
+              color: rgb(255, 84, 84);
+            }
+          }
+
+          .fc-sun {
+            .fc-day-number {
+              color: rgb(255, 84, 84);
+            }
           }
         }
 
-        .fc-sun {
-          .fc-day-number {
-            color: rgb(255, 84, 84);
-          }
-        }
-      }
+        tbody {
+          td {
+            &.fc-event-container {
+              &:hover {
+                position: relative;
+                height: 22px;
 
-      tbody {
-        .is_holiday {
-          border-color: rgb(255, 84, 84);
-          background-color: rgb(255, 84, 84);
+                .fc-event {
+                  &:not(.is_holiday) {
+                    position: absolute;
+                    left: 50%;
+                    top: 0;
+                    transform: translate(-50%, -50%);
+                    z-index: 10;
+                    width: 200%;
+                    padding: 5px;
+                    border: 2px solid rgb(36, 110, 184);
+                    text-align: center;
+
+                    .fc-content {
+                      white-space: normal;
+                    }
+                  }
+                }
+              }
+
+              .is_holiday {
+                border-color: rgb(255, 84, 84);
+                background-color: rgb(255, 84, 84);
+              }
+            }
+
+            &:first-of-type {
+              &.fc-event-container:hover {
+                .fc-event:not(.is_holiday) {
+                  left: 0;
+                  transform: translate(0, -50%);
+                }
+              }
+            }
+
+            &:last-of-type {
+              &.fc-event-container:hover {
+                .fc-event:not(.is_holiday) {
+                  left: unset;
+                  right: 0;
+                  transform: translate(0, -50%);
+                }
+              }
+            }
+          }
         }
       }
     }
