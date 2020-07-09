@@ -91,11 +91,11 @@ export default {
     },
     //カレンダー内のイベントをクリックしたときの挙動を設定
     //in-sessionページの該当するイベントの箇所に飛ばす
-    changeEventHref: function () {
+    modifyEventElement: function () {
       const self = this;
       const event_elements = self.$el.getElementsByClassName("fc-event");
 
-      //要素の取得に失敗したとき（まだfc-event要素がレンダーされていない。）
+      //要素の取得に失敗したとき（まだfc-event要素がレンダーされていない。）。その月にイベントがない時も失敗する。
       if (event_elements.length === 0) {
         return false;
       }
@@ -105,17 +105,23 @@ export default {
         if (element.classList.contains("is_holiday")) {
           element.href = "";
           element.addEventListener("click", (e) => e.preventDefault());
-        }
-        //イベントのタイトルを取得してクリック時の画面遷移を設定する
-        else {
+        } else {
+          //イベントのタイトルを取得
           let title_element = element.getElementsByClassName("fc-title")[0];
           let title = title_element.innerHTML;
           element.href = `/in-session#${title}`;
 
+          //イベント名が一定より長かったら途中で切る。ホバー時にポップオーバーするとき表示が崩れないようにするため。
+          if (title.length > 50) {
+            title_element.innerHTML = title.substring(0, 40) + "...";
+          }
+
+          //イベントクリック時の画面遷移を設定する
           element.addEventListener("click", (e) => {
+            console.log("fugafuga");
             e.preventDefault(); //vue-routerで制御するため
             self.$router.push({
-              name: "InSession", //note: nameで遷移先を指定しないとparamsが渡せなかった.
+              name: "InSession", //note: nameキーで遷移先を指定しないとparamsが渡せなかった.
               params: { id: title },
             });
           });
@@ -124,26 +130,52 @@ export default {
 
       return true;
     },
+    //クリックを無効にしてからmodifyEventElementを呼び出す。modifyEventElementが成功したらクリック無効を解除する。
+    tryModifyEventElement: function () {
+      const self = this;
+      const preventClick = (e) => e.preventDefault();
+
+      //modifyEventElementが発火するまではクリックしてもリンク先に飛ばないようにする
+      this.$el.addEventListener("click", preventClick);
+      console.log("Add event listener.");
+
+      const removeClickListener = function () {
+        self.$el.removeEventListener("click", preventClick);
+        console.log("Removed event listener.");
+      };
+
+      const sayFailLoad = () => {
+        console.log("Failed to load event data");
+      };
+
+      //500msくらい時間を置いて実行すれば大丈夫そうだが、念のためpromiseメソッドで成功するまで再起実行するようにしている。
+      this.promise(
+        this.modifyEventElement,
+        removeClickListener,
+        sayFailLoad,
+        500
+      );
+    },
+    //カレンダーのボタンをクリックしたとき
+    addClickButtonListener: function () {
+      const self = this;
+
+      //カレンダーの月を移動した時にonLoadPageが発動するように設定
+      const button_elements = Array.from(
+        self.$el.getElementsByClassName("fc-button")
+      );
+      button_elements.forEach((element) => {
+        element.addEventListener("click", self.onLoadPage);
+      });
+    },
+    //ページロード時にカレンダーのイベントをクリックした時の挙動を設定する
+    onLoadPage: function () {
+      this.tryModifyEventElement();
+      this.addClickButtonListener();
+    },
   },
   mounted() {
-    const self = this;
-    const preventClick = (e) => e.preventDefault();
-
-    //changeEventHrefが発火するまではクリックしてもリンク先に飛ばないようにする
-    this.$el.addEventListener("click", preventClick);
-    console.log("Add event listener.");
-
-    const removeClickListener = function () {
-      self.$el.removeEventListener("click", preventClick);
-      console.log("Removed event listener.");
-    };
-
-    const sayFailLoad = () => {
-      console.log("Failed to load event data");
-    };
-
-    //500msくらい時間を置いて実行すれば大丈夫そうだが、念のためpromiseメソッドで成功するまで再起実行するようにしている。
-    this.promise(this.changeEventHref, removeClickListener, sayFailLoad, 500);
+    this.onLoadPage();
   },
 };
 </script>
