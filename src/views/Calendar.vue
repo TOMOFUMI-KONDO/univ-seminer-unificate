@@ -216,6 +216,14 @@ export default {
         tbody {
           td {
             &.fc-event-container {
+              .fc-event {
+                &:not(.is_holiday) {
+                  width: 90%;
+                  transition-property: padding-left, padding-right;
+                  transition-duration: 0.1s;
+                }
+              }
+
               &:hover {
                 position: relative;
                 height: 22px;
@@ -229,8 +237,11 @@ export default {
                     z-index: 10;
                     width: 200%;
                     padding: 5px;
-                    border: 2px solid rgb(36, 110, 184);
+                    border: 2px solid darken(#37bcd8, 10%);
+                    background-color: #37bcd8;
                     text-align: center;
+                    transition-property: padding, background-color;
+                    transition-duration: 0.1s;
 
                     .fc-content {
                       white-space: normal;
