@@ -1,16 +1,12 @@
 <template>
-  <div class="in-session px-lg-5 px-4">
-    <!--    todo: 各学部のイベントページのリンクが張ってあるページを1つ用意してそっちに移行する-->
-    <!--    <p class="mb-4 text-left">東北大学のイベントページは-->
-    <!--      <a href="https://www.tohoku.ac.jp/japanese/2020/cate_event/" target="_blank">こちら</a>-->
-    <!--    </p>-->
+  <div class="events px-lg-5 px-4">
     <div
-      class="d-flex justify-content-between align-items-start flex-column flex-sm-row"
+      class="d-flex justify-content-between align-items-start flex-column flex-lg-row"
     >
-      <p class="text-left indent pb-3">
+      <p class="text-left pb-3 description">
         ※イベントの<b>タイトル部分</b>をクリックしてGoogleカレンダーへ移動し、そこでイベントを複製すれば自分のカレンダーにイベントを追加できます。
       </p>
-      <div>
+      <div class="ml-lg-5">
         <input
           class="mr-1 checkbox"
           type="checkbox"
@@ -28,6 +24,14 @@
         :key="event.summary"
       />
     </b-card-group>
+    <p class="text-right font-weight-bold">
+      東北大学のイベントページは
+      <a
+        href="https://www.tohoku.ac.jp/japanese/2020/cate_event/"
+        target="_blank"
+        >こちら</a
+      >
+    </p>
   </div>
 </template>
 
@@ -36,7 +40,7 @@ import Event from "../components/Event.vue";
 import moment from "moment";
 
 export default {
-  name: "InSession",
+  name: "Events",
   components: { Event },
   props: ["id"],
   data() {
@@ -124,6 +128,7 @@ export default {
         });
     },
     //イベントの開始時刻と終了時刻を受け取り、イベントの開催状況（開催中・終わった  ・これから）を返す。
+    //note: カレンダーからの遷移を考慮して今日のイベントは全てnowにしてるが、そこは要検討。時分まで見る実装も残しておく。
     getEventTime(start, end) {
       let now = this.now;
 
@@ -143,20 +148,24 @@ export default {
       //既に終わったイベントの場合
       if (joinedEndYMD - joinedNowYMD < 0) return "past";
 
-      //全日イベントの場合は開始・終了時刻に0が入っている
-      if (start.hour === 0 && end.hour === 0) {
-        return "now";
-      }
+      // //note: 時分まで見る場合はこれは消す
+      // return "now";
 
-      //開始時間の時単位が同じ場合は分で判別
-      if (start.hour === now.hour) {
-        return start.minute > now.minute ? "future" : "now";
-      }
-
-      //終了時間の時単位が同じ場合は分で判別
-      if (end.hour === now.hour) {
-        return end.minute < now.minute ? "past" : "now";
-      }
+      //note: 時分まで見る実装
+      // //全日イベントの場合は開始・終了時刻に0が入っている
+      // if (start.hour === 0 && end.hour === 0) {
+      //   return "now";
+      // }
+      //
+      // //開始時間の時単位が同じ場合は分で判別
+      // if (start.hour === now.hour) {
+      //   return start.minute > now.minute ? "future" : "now";
+      // }
+      //
+      // //終了時間の時単位が同じ場合は分で判別
+      // if (end.hour === now.hour) {
+      //   return end.minute < now.minute ? "past" : "now";
+      // }
     },
     //年月日を受け取り、桁を考慮して合成する関数
     getJoinedYMD(year, month, day) {
@@ -240,7 +249,8 @@ export default {
 </script>
 
 <style scoped lang="scss">
-.indent {
+.description {
+  flex: 1;
   padding-left: 1em;
   text-indent: -1em;
 }
@@ -253,5 +263,9 @@ export default {
   > :not(.current) {
     display: none;
   }
+}
+
+.card-deck {
+  justify-content: space-around;
 }
 </style>

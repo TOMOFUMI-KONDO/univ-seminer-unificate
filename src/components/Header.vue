@@ -5,7 +5,8 @@
       <b-navbar-toggle target="nav-collapse" class="border-0" />
       <b-collapse id="nav-collapse" class="flex-grow-0" is-nav>
         <router-link to="/">イベントカレンダー</router-link>
-        <router-link to="/in-session">イベント詳細</router-link>
+        <router-link to="/events">イベント詳細</router-link>
+        <router-link to="/archive">過去のイベント</router-link>
         <auth />
       </b-collapse>
     </b-navbar>
@@ -99,6 +100,10 @@ header {
       color: #fafafa;
 
       @media (min-width: 992px) {
+        margin-right: 30px;
+      }
+
+      @media (min-width: 1171px) {
         margin-right: 40px;
       }
 

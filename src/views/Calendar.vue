@@ -89,8 +89,29 @@ export default {
           rejectFunc();
         });
     },
+    //引数のDOM要素から、そのイベントの開催日を取得する
+    getEventDateTime: function (element) {
+      const td = element.parentNode; //elementを含むtd(fc-event-container)を取得
+      const tr = td.parentNode;
+      const tds = Array.from(tr.childNodes); //tdを含むtrの子要素をすべて取得し配列に
+      const index = tds.indexOf(td); //tdのインデックスを取得
+
+      const thead = tr.parentNode.previousSibling;
+
+      //対応するtheadのclassListを取得
+      const class_list = Array.from(
+        thead.firstChild.childNodes.item(index).classList
+      );
+
+      //イベントの開催時期を示すクラスを取得
+      const event_period = class_list.find((element) =>
+        element.match(/fc-(past|today|future)/)
+      );
+
+      return event_period.replace("fc-", "");
+    },
     //カレンダー内のイベントをクリックしたときの挙動を設定
-    //in-sessionページの該当するイベントの箇所に飛ばす
+    //eventsページの該当するイベントの箇所に飛ばす
     modifyEventElement: function () {
       const self = this;
       const event_elements = self.$el.getElementsByClassName("fc-event");
@@ -107,21 +128,30 @@ export default {
           element.addEventListener("click", (e) => e.preventDefault());
         } else {
           //イベントのタイトルを取得
-          let title_element = element.getElementsByClassName("fc-title")[0];
+          const title_element = element.getElementsByClassName("fc-title")[0];
           let title = title_element.innerHTML;
-          element.href = `/in-session#${title}`;
+
+          const event_period = this.getEventDateTime(element);
+
+          //東北大HPからスクレイピングしたイベントだと【Web○○】などが頭についてるが、
+          //少ないスペースでどんなイベントかを伝えたいためこれらを除外する。
+          title = title.replace(/^【Web(開催|配信)(\/(学内限定|PDP))?】/, "");
+          title_element.innerHTML = title;
+
+          //過去のイベントでなければevents、過去のイベントならarchiveにジャンプするように
+          element.href =
+            event_period !== "past" ? `/events#${title}` : `/archive#${title}`;
 
           //イベント名が一定より長かったら途中で切る。ホバー時にポップオーバーするとき表示が崩れないようにするため。
-          if (title.length > 50) {
+          if (title.length > 40) {
             title_element.innerHTML = title.substring(0, 40) + "...";
           }
 
           //イベントクリック時の画面遷移を設定する
           element.addEventListener("click", (e) => {
-            console.log("fugafuga");
             e.preventDefault(); //vue-routerで制御するため
             self.$router.push({
-              name: "InSession", //note: nameキーで遷移先を指定しないとparamsが渡せなかった.
+              name: event_period !== "past" ? "Events" : "Archive", //note: nameキーで遷移先を指定しないとparamsが渡せなかった.
               params: { id: title },
             });
           });
@@ -137,11 +167,11 @@ export default {
 
       //modifyEventElementが発火するまではクリックしてもリンク先に飛ばないようにする
       this.$el.addEventListener("click", preventClick);
-      console.log("Add event listener.");
+      console.log("Add preventClick.");
 
       const removeClickListener = function () {
         self.$el.removeEventListener("click", preventClick);
-        console.log("Removed event listener.");
+        console.log("Removed preventClick.");
       };
 
       const sayFailLoad = () => {
@@ -237,8 +267,8 @@ export default {
                     z-index: 10;
                     width: 200%;
                     padding: 5px;
-                    border: 2px solid darken(#37bcd8, 10%);
-                    background-color: #37bcd8;
+                    border: 2px solid darken(#175899, 10%);
+                    background-color: #175899;
                     text-align: center;
                     transition-property: padding, background-color;
                     transition-duration: 0.1s;

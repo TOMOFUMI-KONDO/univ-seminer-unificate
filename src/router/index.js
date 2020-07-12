@@ -15,11 +15,18 @@ const routes = [
     meta: { title: "イベントカレンダー" },
   },
   {
-    path: "/in-session/",
-    name: "InSession",
-    component: () => import("../views/InSession"),
+    path: "/events/",
+    name: "Events",
+    component: () => import("../views/Events"),
     meta: { title: "開催中のイベント" },
-    props: true, //InSessionコンポーネントにrouterからpropsを渡すことを許可
+    props: true, //Eventsコンポーネントにrouterからpropsを渡すことを許可
+  },
+  {
+    path: "/archive/",
+    name: "Archive",
+    component: () => import("../views/Archive"),
+    meta: { title: "過去のイベント" },
+    props: true, //Archiveコンポーネントにrouterからpropsを渡すことを許可
   },
   {
     path: "/sign-in",
@@ -29,7 +36,7 @@ const routes = [
   },
   {
     path: "*",
-    redirect: "/sign-in",
+    redirect: "/",
   },
 ];
 
