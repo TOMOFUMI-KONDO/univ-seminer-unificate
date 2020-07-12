@@ -117,7 +117,7 @@ export default {
               //past, now, future以外の値が返ってきたとき
               default:
                 console.log(
-                  "予期せぬエラー：getEventTimeが不正な値を返しました。"
+                  `予期せぬエラー：getEventTimeが不正な値${event_time}を返しました。`
                 );
                 break;
             }
@@ -148,28 +148,37 @@ export default {
       //既に終わったイベントの場合
       if (joinedEndYMD - joinedNowYMD < 0) return "past";
 
-      // //note: 時分まで見る場合はこれは消す
+      // note: 時分まで見る場合はこれは消す
       // return "now";
 
-      //note: 時分まで見る実装
+      // note: 時分まで見る実装
       // //全日イベントの場合は開始・終了時刻に0が入っている
       // if (start.hour === 0 && end.hour === 0) {
       //   return "now";
       // }
       //
-      // //開始時間の時単位が同じ場合は分で判別
-      // if (start.hour === now.hour) {
-      //   return start.minute > now.minute ? "future" : "now";
-      // }
+      // //現在時刻の時分を合成
+      // let joinedNowHM = this.getJoinedHM(now.hour, now.minute);
+      // //イベント開催時刻の時分を合成
+      // let joinedStartHM = this.getJoinedHM(start.hour, start.minute);
+      // //イベント終了時刻の時分を合成
+      // let joinedEndHM = this.getJoinedHM(end.hour, end.minute);
       //
-      // //終了時間の時単位が同じ場合は分で判別
-      // if (end.hour === now.hour) {
-      //   return end.minute < now.minute ? "past" : "now";
-      // }
+      // //まだ開催されていないイベントの場合
+      // if (joinedNowHM - joinedStartHM < 0) return "future";
+      // //既に終わったイベントの場合
+      // if (joinedEndHM - joinedNowHM < 0) return "past";
+      //
+      // //イベントが開催中の場合
+      // return "now";
     },
     //年月日を受け取り、桁を考慮して合成する関数
     getJoinedYMD(year, month, day) {
       return year * 10 ** 4 + month * 10 ** 2 + day;
+    },
+    //時分を受け取り、桁を考慮して合成する関数
+    getJoinedHM(hour, minute) {
+      return hour * 10 ** 2 + minute;
     },
     //世界標準時を引数に取り、年月日などをキーにしたオブジェクトにして返す
     getTimeInfo(dateTime = null) {
