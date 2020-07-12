@@ -49,10 +49,10 @@
 import Event from "../components/Event.vue";
 import moment from "moment";
 import firebase from "firebase/app";
-import "firebase/firestore";
+import "firebase/app"
+import "firebase/firestore"
 
 export default {
-  el: '#tabBox',
   name: "Events",
   components: { Event },
   props: ["id"],
@@ -84,9 +84,7 @@ export default {
           var data = doc.data();
           buff.push([data.summary, data.viewed, data.description, data.htmlLink]);
         })
-      console.log(buff);
       })
-      console.log(this.eventData);
     },
     //google calendar apiを読み込む
     load() {
@@ -278,7 +276,6 @@ export default {
       this.eventData.forEach(function (element) {
         element.viewed = 0;
       })
-      console.log(this.buff.length);
       for(let i = 0; i < this.buff.length; i++) {
         for(let k = 0; k < this.eventData.length; k++) {
           var str1 = this.eventData[k].summary;
@@ -290,9 +287,6 @@ export default {
       }
       this.eventData.sort((a,b) => (
         a.viewed > b.viewed) ? -1 : ((b.viewed > a.viewed) ? 1 : 0));
-      for(let i = 0; i < this.eventData.length; i++) {
-        console.log(this.eventData[i].viewed);
-      }
     },
     orderByDate() {
       this.eventData.sort((a,b) => (
@@ -310,10 +304,6 @@ export default {
     this.load();
     this.load_firebase();
   },
-  computed() {
-    //eventDataを並び替えrる
-    
-  }
 };
 </script>
 
