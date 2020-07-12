@@ -15,6 +15,8 @@
         />
         <label for="display_current">開催中のイベントのみ表示</label>
       </div>
+      <input type="button" value="閲覧数順" v-on:click="orderByViewed()"/>
+      <input type="button" value="日付順" v-on:click="orderByDate()"/>
     </div>
     <b-card-group deck :class="this.displayCurrent ? 'show_current' : ''">
       <Event
@@ -38,6 +40,8 @@
 <script>
 import Event from "../components/Event.vue";
 import moment from "moment";
+import firebase from "firebase/app";
+import "firebase/firestore";
 
 export default {
   name: "Events",
@@ -45,6 +49,7 @@ export default {
   props: ["id"],
   data() {
     return {
+      buff: [],
       now: {}, //現在の時刻情報
       eventData: [], //全てのイベントデータ
       inSessionEvents: [], //開催中のイベントのインデックス
@@ -57,6 +62,22 @@ export default {
     };
   },
   methods: {
+    //firebaseのデータを読み込む
+    load_firebase() {
+      var db = firebase.firestore();
+      var buff = this.buff;
+      db.collection("events").orderBy("viewed" ,"desc").limit(6)
+      .get()
+      .then(function(querySnapshot){
+        querySnapshot.forEach(function(doc) {
+          //console.log(doc.summary, "=>", doc.data());
+          var data = doc.data();
+          buff.push([data.summary, data.viewed, data.description, data.htmlLink]);
+        })
+      console.log(buff);
+      })
+      console.log(this.eventData);
+    },
     //google calendar apiを読み込む
     load() {
       // eslint-disable-next-line no-undef
@@ -243,6 +264,41 @@ export default {
         }
       }, 600); //600msくらいだと丁度イベントデータのレンダリングが終わっていが、念のためscrollToIdを再起実行している。
     },
+    orderByViewed() {
+      alert('oderByViewed');
+      this.eventData.forEach(function (element) {
+        element.viewed = 0;
+      })
+      console.log(this.buff.length);
+      for(let i = 0; i < this.buff.length; i++) {
+        for(let k = 0; k < this.eventData.length; k++) {
+          var str1 = this.eventData[k].summary;
+          var str2 = this.buff[i][0];
+          if(str1 == str2) {
+            this.eventData[k].viewed = this.buff[i][1];
+          }
+        }
+      }
+      this.eventData.sort((a,b) => (
+        a.viewed > b.viewed) ? -1 : ((b.viewed > a.viewed) ? 1 : 0));
+      for(let i = 0; i < this.eventData.length; i++) {
+        console.log(this.eventData[i].viewed);
+      }
+    },
+    orderByDate() {
+      alert('oderByDate');
+      this.eventData.sort((a,b) => (
+        a.start.date > b.start.date) ? 1 : ((b.start.date > a.start.date) ? -1 : 0));
+    },
+    /*compare_viewed(a,b) {
+      if(a.viewed < b.viewed){
+        return 1;
+      }
+      if(a.viewed > b.viewed){
+        return -1;
+      }
+      return 0;
+    }*/
   },
   mounted() {
     if (this.id !== undefined) {
@@ -253,7 +309,12 @@ export default {
   created() {
     this.now = this.getTimeInfo();
     this.load();
+    this.load_firebase();
   },
+  computed() {
+    //eventDataを並び替えrる
+    
+  }
 };
 </script>
 
