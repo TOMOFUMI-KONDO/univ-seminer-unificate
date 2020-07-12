@@ -15,9 +15,17 @@
         />
         <label for="display_current">開催中のイベントのみ表示</label>
       </div>
-      <input type="button" value="閲覧数順" v-on:click="orderByViewed()"/>
-      <input type="button" value="日付順" v-on:click="orderByDate()"/>
     </div>
+    <div id="tabBox">
+    <div id="tabs">
+        <input type="radio" value="1" id="tab1" v-model="isActive" v-on:click="orderByDate()"/>
+        <label for="tab1">開催日が早い順</label>
+ 
+        <input type="radio" value="2" id="tab2" v-model="isActive" v-on:click="orderByViewed()"/>
+        <label for="tab2">閲覧数が多い順</label>
+    </div>
+    </div><!--tabBox-->
+    
     <b-card-group deck :class="this.displayCurrent ? 'show_current' : ''">
       <Event
         :class="isCurrent(index)"
@@ -44,11 +52,13 @@ import firebase from "firebase/app";
 import "firebase/firestore";
 
 export default {
+  el: '#tabBox',
   name: "Events",
   components: { Event },
   props: ["id"],
   data() {
     return {
+      isActive: '1',
       buff: [],
       now: {}, //現在の時刻情報
       eventData: [], //全てのイベントデータ
@@ -265,7 +275,6 @@ export default {
       }, 600); //600msくらいだと丁度イベントデータのレンダリングが終わっていが、念のためscrollToIdを再起実行している。
     },
     orderByViewed() {
-      alert('oderByViewed');
       this.eventData.forEach(function (element) {
         element.viewed = 0;
       })
@@ -286,19 +295,9 @@ export default {
       }
     },
     orderByDate() {
-      alert('oderByDate');
       this.eventData.sort((a,b) => (
         a.start.date > b.start.date) ? 1 : ((b.start.date > a.start.date) ? -1 : 0));
     },
-    /*compare_viewed(a,b) {
-      if(a.viewed < b.viewed){
-        return 1;
-      }
-      if(a.viewed > b.viewed){
-        return -1;
-      }
-      return 0;
-    }*/
   },
   mounted() {
     if (this.id !== undefined) {
@@ -337,5 +336,31 @@ export default {
 
 .card-deck {
   justify-content: space-around;
+}
+
+#tabs {
+    overflow: hidden;
+}
+ 
+#tabs input {
+  display: none;
+}
+ 
+#tabs label {
+    margin-right: 10px;
+    display: inline-block;
+    line-height: 40px;
+    width: 120px;
+    text-align: center;
+    cursor: pointer;
+    background: #eee;
+    transition: 0.3s;
+    border-radius: 10px 10px 0 0;
+}
+ 
+#tabs input:checked + label,
+#tabs label:hover {
+    background: #56B4BE;
+    color: #fff;
 }
 </style>
