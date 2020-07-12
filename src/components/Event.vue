@@ -1,5 +1,5 @@
 <template>
-  <div class="event card border-info mb-5 mx-15px" :id="this.summary">
+  <div class="event card border-info mb-5 mx-0" :id="this.summary">
     <p v-b-tooltip="this.summary" class="card-header bg-info font-weight-bold">
       <a :href="this.html_link" class="text-light" target="_blank">{{
         this.short_summary
@@ -36,12 +36,16 @@ export default {
   },
   methods: {
     setValue(val) {
-      this.summary = val.summary; //tooltipで表示するように元のタイトルを取っておく
+      //tooltipで表示するように元のタイトルを取っておく
+      let summary = val.summary;
+      summary = summary.replace(/^【Web(開催|配信)(\/(学内限定|PDP))?】/, "");
+      this.summary = summary;
+
       //タイトルがthis.max_summaryの値より長かったら途中で切る。
       if (val.summary.length > this.max_summary) {
-        this.short_summary = val.summary.substring(0, this.max_summary) + "...";
+        this.short_summary = summary.substring(0, this.max_summary) + "...";
       } else {
-        this.short_summary = val.summary;
+        this.short_summary = summary;
       }
 
       //文字数が150文字より多ければ切り取る。
@@ -71,9 +75,6 @@ export default {
     getTime(datetime) {
       return moment(datetime).format("　HH:mm~");
     },
-    // modifySummary(summary) {
-    //     //東北大のHPからとってきたデータに
-    // }
   },
   created() {
     this.setValue(this.eventData);
@@ -84,11 +85,13 @@ export default {
 <style scoped lang="scss">
 .event {
   @media (min-width: 576px) {
-    flex: 0 45%;
+    flex: 0 50%;
+    max-width: 45%;
   }
 
   @media (min-width: 918px) {
-    flex: 0 30%;
+    flex: 0 33%;
+    max-width: 30%;
   }
 }
 </style>
