@@ -74,15 +74,14 @@ export default {
   methods: {
     //firebaseのデータを読み込む
     load_firebase() {
-      var db = firebase.firestore();
-      var buff = this.buff;
+      const db = firebase.firestore();
+      let buff = this.buff;
       db.collection("events").orderBy("viewed" ,"desc").limit(6)
       .get()
       .then(function(querySnapshot){
         querySnapshot.forEach(function(doc) {
-          //console.log(doc.summary, "=>", doc.data());
-          var data = doc.data();
-          buff.push([data.summary, data.viewed, data.description, data.htmlLink]);
+          let data = doc.data();
+          buff.push([data.summary, data.viewed]);
         })
       })
     },
@@ -273,14 +272,14 @@ export default {
       }, 600); //600msくらいだと丁度イベントデータのレンダリングが終わっていが、念のためscrollToIdを再起実行している。
     },
     orderByViewed() {
-      this.eventData.forEach(function (element) {
+      this.eventData.forEach(function (element) { //eventDataの各オブジェクトにviewedプロパティ(初期値0)を追加
         element.viewed = 0;
       })
       for(let i = 0; i < this.buff.length; i++) {
+        let str2 = this.buff[i][0];
         for(let k = 0; k < this.eventData.length; k++) {
-          var str1 = this.eventData[k].summary;
-          var str2 = this.buff[i][0];
-          if(str1 == str2) {
+          let str1 = this.eventData[k].summary;
+          if(str1 === str2) {
             this.eventData[k].viewed = this.buff[i][1];
           }
         }
@@ -338,9 +337,10 @@ export default {
  
 #tabs label {
     margin-right: 10px;
+    margin-bottom: 20px;
     display: inline-block;
     line-height: 40px;
-    width: 120px;
+    width: 200px;
     text-align: center;
     cursor: pointer;
     background: #eee;

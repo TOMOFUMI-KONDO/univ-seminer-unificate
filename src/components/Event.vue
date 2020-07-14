@@ -81,30 +81,26 @@ export default {
     },
     //クリック数をfirebaseに保存する関数
     count: function (message) {
-      alert(this.replace(message))
-      var db = firebase.firestore();
-      var event_cnt = db.collection("events").doc(this.replace(message))
+      const db = firebase.firestore();
+      let event_cnt = db.collection("events").doc(this.replace(message))
       event_cnt.update({
         viewed: firebase.firestore.FieldValue.increment(1)
       })
+      //firebaseにイベントが存在しない場合、新たにセットする
       .catch(e => {
         event_cnt.set(this.eventData)
         event_cnt.update({
         viewed: firebase.firestore.FieldValue.increment(1)
         })
-        .then(function(docRef) {
-        console.log("Document written with ID: ", docRef.id);
-        })
-        .catch(function(error) {
-        console.error("Error adding document: ", error);
-        });
         console.log(e)
       })
     },
     //文字列からスラッシュを除去する関数
+    //firebaseのドキュメント名にイベント名を使用しているが
+    //スラッシュはドキュメント名に使用できないためこの関数を使用している
     replace: function(message){
-      var before = message;
-      var after = "";
+      let before = message;
+      let after = "";
       after = before.replace( /\//g , "" ) ;
       return after;
     }
