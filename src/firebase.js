@@ -28,7 +28,7 @@ export default {
       });
     firebase.analytics();
   },
-  login() {
+  login(path) {
     const provider = new firebase.auth.GoogleAuthProvider();
     provider.setCustomParameters({
       hd: `tohoku.ac.jp`, //このドメインのみでログイン可（dc.tohoku.ac.jpはこれのサブドメインなのでログイン可）
@@ -38,12 +38,29 @@ export default {
       .auth()
       .signInWithPopup(provider)
       .then(() => {
-        router.push("/").then();
+        router.push(path).then();
       })
       .catch((e) => {
+        alert(e.message);
         console.log(e);
-        this.errorMessage = e.message;
-        this.ifError = true;
+      });
+  },
+  manageLogin(password) {
+    firebase
+      .auth()
+      .signInWithEmailAndPassword("root@tohoku.univ.seminer", password)
+      .then(() => {
+        router.push("/management").then();
+      })
+      .catch((e) => {
+        const errorCode = e.code;
+        const errorMessage = e.message;
+        if (errorCode === "auth/wrong-password") {
+          alert("Wrong password...");
+        } else {
+          alert(errorMessage);
+        }
+        console.log(e);
       });
   },
   logout() {

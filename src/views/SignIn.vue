@@ -16,9 +16,6 @@
         <p class="mb-0">東北大アカウントで<br class="d-sm-none" />サインイン</p>
       </b-button>
     </div>
-    <b-alert v-if="isError" dismissible variant="danger" class="mt-2">{{
-      errorMessage
-    }}</b-alert>
     <b-dd
       block
       variant="outline-secondary"
@@ -40,21 +37,15 @@ import firebase from "../firebase";
 
 export default {
   name: "SignIn",
-  data() {
-    return {
-      errorMessage: "",
-      isError: false,
-    };
-  },
   methods: {
     googleSignIn() {
-      firebase.login();
+      firebase.login("/");
     },
   },
 };
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 .button-wrapper {
   width: 90%;
   max-width: 500px;

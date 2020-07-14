@@ -35,6 +35,18 @@ const routes = [
     meta: { title: "サインイン" },
   },
   {
+    path: "/manage-sign-in",
+    name: "ManageSignIn",
+    component: () => import("../views/ManageSignIn"),
+    meta: { title: "管理者サインイン" },
+  },
+  {
+    path: "/management",
+    name: "Management",
+    component: () => import("../views/Management"),
+    meta: { title: "イベント管理" },
+  },
+  {
     path: "*",
     redirect: "/",
   },
@@ -50,9 +62,12 @@ const router = new VueRouter({
 router.beforeResolve((to, from, next) => {
   store.commit("onLoadingStateChanged", true);
 
-  if (to.path === "/sign-in") {
+  if (to.path === "/sign-in" || to.path === "/manage-sign-in") {
     setTitle(to.meta.title); //タイトルを動的に設定
     next();
+    store.commit("onLoadingStateChanged", false);
+  } else if (to.path === "management") {
+    next({ path: "manage-sign-in" });
     store.commit("onLoadingStateChanged", false);
   } else {
     firebase.auth().onAuthStateChanged((user) => {
