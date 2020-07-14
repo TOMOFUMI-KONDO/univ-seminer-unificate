@@ -149,7 +149,7 @@ export default {
       if (joinedEndYMD - joinedNowYMD < 0) return "past";
 
       // note: 時分まで見る場合はこれは消す
-      // return "now";
+      return "now";
 
       // note: 時分まで見る実装
       // //全日イベントの場合は開始・終了時刻に0が入っている
