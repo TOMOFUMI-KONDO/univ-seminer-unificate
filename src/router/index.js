@@ -66,9 +66,17 @@ router.beforeResolve((to, from, next) => {
     setTitle(to.meta.title); //タイトルを動的に設定
     next();
     store.commit("onLoadingStateChanged", false);
-  } else if (to.path === "management") {
-    next({ path: "manage-sign-in" });
-    store.commit("onLoadingStateChanged", false);
+  } else if (to.path === "/management") {
+    firebase.auth().onAuthStateChanged((user) => {
+      if (user && user.email === "root@tohoku.univ.seminer") {
+        setTitle(to.meta.title); //タイトルを動的に設定
+        next();
+        store.commit("onLoadingStateChanged", false);
+      } else {
+        next({ path: "/manage-sign-in" });
+        store.commit("onLoadingStateChanged", false);
+      }
+    });
   } else {
     firebase.auth().onAuthStateChanged((user) => {
       if (user) {

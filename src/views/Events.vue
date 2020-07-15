@@ -65,6 +65,8 @@ export default {
     //google calendar apiを利用してイベント情報を取得する
     init() {
       // eslint-disable-next-line no-undef
+      console.log(gapi);
+      // eslint-disable-next-line no-undef
       gapi.client
         .init({
           apiKey: this.apiKey,

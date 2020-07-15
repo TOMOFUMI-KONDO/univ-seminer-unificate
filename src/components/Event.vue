@@ -48,13 +48,16 @@ export default {
         this.short_summary = summary;
       }
 
+      let description = val.description;
+      if (description) {
+        description = val.description.substring(0, this.max_description);
+        //urlをaタグに変更
+        this.description = description.replace(
+          /(http(s)?:\/\/[-_.!~*'()a-zA-Z0-9;/?:@&=+$,%#]+)/,
+          '<a href="$1" target="_blank">$1</a>'
+        );
+      }
       //文字数が150文字より多ければ切り取る。
-      let description = val.description.substring(0, this.max_description);
-      //urlをaタグに変更
-      this.description = description.replace(
-        /(http(s)?:\/\/[-_.!~*'()a-zA-Z0-9;/?:@&=+$,%#]+)/,
-        '<a href="$1" target="_blank">$1</a>'
-      );
 
       if ("dateTime" in val.start) {
         let dateTime = val.start.dateTime;
