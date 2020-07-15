@@ -1,6 +1,7 @@
 import firebase from "firebase/app";
 import "firebase/auth";
 import "firebase/analytics"
+import "firebase/firestore"
 import store from "./store";
 import router from "./router";
 

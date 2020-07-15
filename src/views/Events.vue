@@ -16,6 +16,16 @@
         <label for="display_current">開催中のイベントのみ表示</label>
       </div>
     </div>
+    <div id="tabBox">
+    <div id="tabs">
+        <input type="radio" value="1" id="tab1" v-model="isActive" v-on:click="orderByDate()"/>
+        <label for="tab1">開催日が早い順</label>
+ 
+        <input type="radio" value="2" id="tab2" v-model="isActive" v-on:click="orderByViewed()"/>
+        <label for="tab2">閲覧数が多い順</label>
+    </div>
+    </div><!--tabBox-->
+    
     <b-card-group deck :class="this.displayCurrent ? 'show_current' : ''">
       <Event
         :class="isCurrent(index)"
@@ -38,6 +48,9 @@
 <script>
 import Event from "../components/Event.vue";
 import moment from "moment";
+import firebase from "firebase/app";
+import "firebase/app"
+import "firebase/firestore"
 
 export default {
   name: "Events",
@@ -45,6 +58,8 @@ export default {
   props: ["id"],
   data() {
     return {
+      isActive: '1',
+      buff: [],
       now: {}, //現在の時刻情報
       eventData: [], //全てのイベントデータ
       inSessionEvents: [], //開催中のイベントのインデックス
@@ -57,6 +72,19 @@ export default {
     };
   },
   methods: {
+    //firebaseのデータを読み込む
+    load_firebase() {
+      const db = firebase.firestore();
+      let buff = this.buff;
+      db.collection("events").orderBy("viewed" ,"desc").limit(6)
+      .get()
+      .then(function(querySnapshot){
+        querySnapshot.forEach(function(doc) {
+          let data = doc.data();
+          buff.push([data.summary, data.viewed]);
+        })
+      })
+    },
     //google calendar apiを読み込む
     load() {
       // eslint-disable-next-line no-undef
@@ -243,6 +271,26 @@ export default {
         }
       }, 600); //600msくらいだと丁度イベントデータのレンダリングが終わっていが、念のためscrollToIdを再起実行している。
     },
+    orderByViewed() {
+      this.eventData.forEach(function (element) { //eventDataの各オブジェクトにviewedプロパティ(初期値0)を追加
+        element.viewed = 0;
+      })
+      for(let i = 0; i < this.buff.length; i++) {
+        let str2 = this.buff[i][0];
+        for(let k = 0; k < this.eventData.length; k++) {
+          let str1 = this.eventData[k].summary;
+          if(str1 === str2) {
+            this.eventData[k].viewed = this.buff[i][1];
+          }
+        }
+      }
+      this.eventData.sort((a,b) => (
+        a.viewed > b.viewed) ? -1 : ((b.viewed > a.viewed) ? 1 : 0));
+    },
+    orderByDate() {
+      this.eventData.sort((a,b) => (
+        a.start.date > b.start.date) ? 1 : ((b.start.date > a.start.date) ? -1 : 0));
+    },
   },
   mounted() {
     if (this.id !== undefined) {
@@ -253,6 +301,7 @@ export default {
   created() {
     this.now = this.getTimeInfo();
     this.load();
+    this.load_firebase();
   },
 };
 </script>
@@ -276,5 +325,32 @@ export default {
 
 .card-deck {
   justify-content: space-around;
+}
+
+#tabs {
+    overflow: hidden;
+}
+ 
+#tabs input {
+  display: none;
+}
+ 
+#tabs label {
+    margin-right: 10px;
+    margin-bottom: 20px;
+    display: inline-block;
+    line-height: 40px;
+    width: 200px;
+    text-align: center;
+    cursor: pointer;
+    background: #eee;
+    transition: 0.3s;
+    border-radius: 10px 10px 0 0;
+}
+ 
+#tabs input:checked + label,
+#tabs label:hover {
+    background: #56B4BE;
+    color: #fff;
 }
 </style>

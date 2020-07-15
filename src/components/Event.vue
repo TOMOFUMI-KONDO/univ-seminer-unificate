@@ -1,7 +1,7 @@
 <template>
   <div class="event card border-info mb-5 mx-0" :id="this.summary">
     <p v-b-tooltip="this.summary" class="card-header bg-info font-weight-bold">
-      <a :href="this.html_link" class="text-light" target="_blank">{{
+      <a :href="this.html_link" class="text-light" target="_blank" v-on:click="count(summary)">{{
         this.short_summary
       }}</a>
     </p>
@@ -19,6 +19,10 @@
 
 <script>
 import moment from "moment";
+import firebase from "firebase";
+import "firebase/firestore"
+
+
 export default {
   name: "Event",
   props: ["eventData"], //親コンポーネントで:event-data="~~~"で与えられるデータ
@@ -75,6 +79,31 @@ export default {
     getTime(datetime) {
       return moment(datetime).format("　HH:mm~");
     },
+    //クリック数をfirebaseに保存する関数
+    count: function (message) {
+      const db = firebase.firestore();
+      let event_cnt = db.collection("events").doc(this.replace(message))
+      event_cnt.update({
+        viewed: firebase.firestore.FieldValue.increment(1)
+      })
+      //firebaseにイベントが存在しない場合、新たにセットする
+      .catch(e => {
+        event_cnt.set(this.eventData)
+        event_cnt.update({
+        viewed: firebase.firestore.FieldValue.increment(1)
+        })
+        console.log(e)
+      })
+    },
+    //文字列からスラッシュを除去する関数
+    //firebaseのドキュメント名にイベント名を使用しているが
+    //スラッシュはドキュメント名に使用できないためこの関数を使用している
+    replace: function(message){
+      let before = message;
+      let after = "";
+      after = before.replace( /\//g , "" ) ;
+      return after;
+    }
   },
   created() {
     this.setValue(this.eventData);
