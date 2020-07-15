@@ -108,7 +108,10 @@ export default {
         })
         .then((response) => {
           const items = response.result.items;
-          let j = 0; //eventDataに保存したイベントの個数だけをカウントする変数
+
+          items.forEach(function (element) { //各オブジェクトにinsessionプロパティ(初期値false)を追加
+            element.insession = false;
+          })
 
           for (let i = 0; i < items.length; i++) {
             let item = items[i];
@@ -129,17 +132,15 @@ export default {
               case "past":
                 break;
 
-              //開催中のイベントのインデックスを保存＆eventDataに追加
+              //開催中のイベントのinsessionプロパティをtrueに＆eventDataに追加
               case "now":
-                this.inSessionEvents.push(j);
+                item.insession = true;
                 this.eventData.push(item);
-                j++;
                 break;
 
               //これから開催するイベントをeventDataに追加
               case "future":
                 this.eventData.push(item);
-                j++;
                 break;
 
               //past, now, future以外の値が返ってきたとき
@@ -232,7 +233,7 @@ export default {
     },
     //開催中のイベントかどうかを返す関数
     isCurrent(index) {
-      if (this.inSessionEvents.includes(index)) {
+      if (this.eventData[index].insession === true) {
         return "current";
       } else {
         return "";
