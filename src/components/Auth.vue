@@ -1,6 +1,6 @@
 <template>
   <p v-if="isSignIn" @click="signOut" class="sign-out d-inline-block mb-0">
-    サインアウト
+    {{$t('signout')}}
   </p>
 </template>
 
