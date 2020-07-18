@@ -45,12 +45,12 @@ export default {
       window.gapi.client
         .init({
           apiKey: this.apiKey,
-          clientId:
-            "1043408526545-l8rn9a0b8qe07hq5hq20u8gp9fden1ai.apps.googleusercontent.com",
-          discoveryDocs: [
-            "https://www.googleapis.com/discovery/v1/apis/calendar/v3/rest",
-          ],
-          scope: "https://www.googleapis.com/auth/calendar",
+          // clientId:
+          //   "1043408526545-l8rn9a0b8qe07hq5hq20u8gp9fden1ai.apps.googleusercontent.com",
+          // discoveryDocs: [
+          //   "https://www.googleapis.com/discovery/v1/apis/calendar/v3/rest",
+          // ],
+          // scope: "https://www.googleapis.com/auth/calendar",
         })
         .then(() => {
           console.log(
@@ -61,7 +61,6 @@ export default {
           );
           console.log(method.toUpperCase());
           if (method === "get") {
-            // eslint-disable-next-line no-undef
             return window.gapi.client.request({
               path:
                 this.calendarUrl +
@@ -69,15 +68,14 @@ export default {
                 "/events",
             });
           } else {
-            return window.gapi.auth2.getAuthInstance();
-            // return window.gapi.client.request({
-            //   path:
-            //     this.calendarUrl +
-            //     encodeURIComponent(this.calendarId) +
-            //     "/events" +
-            //     `/${eventId}`,
-            //   method: method.toUpperCase(),
-            // });
+            return window.gapi.client.request({
+              path:
+                this.calendarUrl +
+                encodeURIComponent(this.calendarId) +
+                "/events" +
+                `/${eventId}`,
+              method: method.toUpperCase(),
+            });
           }
         })
         .then((response) => {
