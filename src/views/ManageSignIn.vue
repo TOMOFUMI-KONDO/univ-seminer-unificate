@@ -14,7 +14,7 @@
           alt="googleのロゴ"
         />
         <p class="mb-0 text-light">
-          登録済みのイベントを<br class="d-sm-none" />管理する
+          登録済みのイベントを<br class="d-sm-none" />削除する
         </p>
       </b-button>
     </div>

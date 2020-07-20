@@ -22,7 +22,7 @@
       text="東北大アカウントとは？"
       class="button-wrapper"
     >
-      <b-dd-text class="dd-item">
+      <b-dd-text>
         東北大アカウントは、<br />
         <span class="d-block pt-3">@tohoku.ac.jp(教職員用)</span>
         <span class="d-block pb-3">@dc.tohoku.ac.jp(学生用)</span>
@@ -45,7 +45,7 @@ export default {
 };
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss">
 .button-wrapper {
   width: 90%;
   max-width: 500px;
