@@ -31,7 +31,7 @@ export default {
       googleCalendarApiKey: process.env.VUE_APP_CALENDAR_API_KEY,
       eventSources: [
         {
-          googleCalendarId: process.env.VUE_APP_CALENDAR_ID,
+          googleCalendarId: this.$calendarId,
         },
         {
           //祝日を取得

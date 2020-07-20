@@ -30,7 +30,7 @@ export default {
     return {
       eventData: [], //全てのイベントデータ
       calendarUrl: "https://www.googleapis.com/calendar/v3/calendars/",
-      calendarId: process.env.VUE_APP_CALENDAR_ID,
+      calendarId: this.$calendarId,
       apiKey: process.env.VUE_APP_CALENDAR_API_KEY,
       tmp: "2r5apt3s261dpam5l7jkc6ui1k",
     };
