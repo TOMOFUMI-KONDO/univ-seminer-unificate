@@ -1,7 +1,13 @@
 <template>
-  <p v-if="isSignIn" @click="signOut" class="sign-out d-inline-block mb-0">
-    サインアウト
-  </p>
+  <div
+    v-if="isSignIn"
+    class="wrapper d-flex flex-column justify-content-between"
+  >
+    <p @click="signOut" class="sign-out d-inline-block mb-0">
+      サインアウト
+    </p>
+    <p class="email">({{ userEmail }})</p>
+  </div>
 </template>
 
 <script>
@@ -11,7 +17,14 @@ export default {
   name: "Auth",
   computed: {
     isSignIn() {
-      return this.$store.getters.isSignIn;
+      return this.$store.getters.userStatus;
+    },
+    userEmail() {
+      if (this.isSignIn) {
+        return this.$store.getters.userStatus.email;
+      } else {
+        return "";
+      }
     },
   },
   methods: {
@@ -19,28 +32,29 @@ export default {
       firebase.logout();
     },
   },
-  created: () => {
-    firebase.onAuth();
-  },
 };
 </script>
 
 <style scoped lang="scss">
-.sign-out {
-  cursor: pointer;
-  font-weight: bold;
-
-  @media (min-width: 1171px) {
+.wrapper {
+  @media (min-width: 1250px) {
     margin-left: 100px;
   }
 
-  @media (max-width: 991px) {
-    margin-top: 20px;
+  margin-top: 30px;
+
+  .sign-out {
+    cursor: pointer;
+    font-weight: bold;
+
+    &:hover {
+      color: darken(#fafafa, 10%);
+      text-decoration: underline;
+    }
   }
 
-  &:hover {
-    color: darken(#fafafa, 10%);
-    text-decoration: underline;
+  .email {
+    font-size: 12px;
   }
 }
 </style>
