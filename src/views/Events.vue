@@ -21,7 +21,7 @@
         :class="isCurrent(index)"
         :event-data="event"
         v-for="(event, index) in eventData"
-        :key="event.summary"
+        :key="event.id"
       />
     </b-card-group>
     <p class="text-right font-weight-bold">
@@ -49,7 +49,7 @@ export default {
       eventData: [], //全てのイベントデータ
       inSessionEvents: [], //開催中のイベントのインデックス
       calendarUrl: "https://www.googleapis.com/calendar/v3/calendars/",
-      calendarId: process.env.VUE_APP_CALENDAR_ID,
+      calendarId: this.$calendarId,
       apiKey: process.env.VUE_APP_CALENDAR_API_KEY,
       displayCurrent: false,
       event_id: "",
@@ -64,16 +64,12 @@ export default {
     },
     //google calendar apiを利用してイベント情報を取得する
     init() {
-      // eslint-disable-next-line no-undef
-      console.log(gapi);
-      // eslint-disable-next-line no-undef
-      gapi.client
+      window.gapi.client
         .init({
           apiKey: this.apiKey,
         })
         .then(() => {
-          // eslint-disable-next-line no-undef
-          return gapi.client.request({
+          return window.gapi.client.request({
             path:
               this.calendarUrl +
               encodeURIComponent(this.calendarId) +
