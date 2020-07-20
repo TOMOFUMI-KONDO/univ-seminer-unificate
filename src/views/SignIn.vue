@@ -39,7 +39,7 @@ export default {
   name: "SignIn",
   methods: {
     googleSignIn() {
-      firebase.login("/");
+      firebase.login();
     },
   },
 };

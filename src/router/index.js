@@ -58,37 +58,54 @@ const router = new VueRouter({
   routes,
 });
 
-//ログインしていなかったら'/sign-in'にリダイレクトする
 router.beforeResolve((to, from, next) => {
   store.commit("onLoadingStateChanged", true);
 
-  if (to.path === "/sign-in" || to.path === "/manage-sign-in") {
-    setTitle(to.meta.title); //タイトルを動的に設定
-    next();
-    store.commit("onLoadingStateChanged", false);
-  } else if (to.path === "/management") {
-    firebase.auth().onAuthStateChanged((user) => {
+  //ログイン状態が変更されたときに発火する
+  firebase.auth().onAuthStateChanged((user) => {
+    if (to.path === "/sign-in") {
+      //すでにgoogleサインイン済みならカレンダーページへリダイレクト
+      if (user && user.email.indexOf("tohoku.ac.jp") !== -1) {
+        setTitle("イベントカレンダー");
+        next({ path: "/" });
+      } else {
+        setTitle(to.meta.title); //タイトルを動的に設定
+        next();
+      }
+    } else if (to.path === "/manage-sign-in") {
+      //すでにパスワードサインイン済みなら管理ページへリダイレクト
+      if (user && user.email === "root@tohoku.univ.seminer") {
+        setTitle("イベント管理");
+        next({ path: "/management" });
+      } else {
+        setTitle(to.meta.title); //タイトルを動的に設定
+        next();
+      }
+    } else if (to.path === "/management") {
       if (user && user.email === "root@tohoku.univ.seminer") {
         setTitle(to.meta.title); //タイトルを動的に設定
         next();
-        store.commit("onLoadingStateChanged", false);
-      } else {
-        next({ path: "/manage-sign-in" });
-        store.commit("onLoadingStateChanged", false);
       }
-    });
-  } else {
-    firebase.auth().onAuthStateChanged((user) => {
-      if (user) {
+      //パスワードログインしていなかったら'manage-sign-in'にリダイレクトする
+      else {
+        setTitle("管理者サインイン");
+        next({ path: "/manage-sign-in" });
+      }
+    } else {
+      if (user && user.email.indexOf("tohoku.ac.jp") !== -1) {
         setTitle(to.meta.title); //タイトルを動的に設定
         next();
-        store.commit("onLoadingStateChanged", false);
-      } else {
-        next({ path: "/sign-in" });
-        store.commit("onLoadingStateChanged", false);
       }
-    });
-  }
+      //Googleアカウントでログインしていなかったら'/sign-in'にリダイレクトする
+      else {
+        setTitle("サインイン");
+        next({ path: "/sign-in" });
+      }
+    }
+
+    store.commit("onUserStatusChanged", user);
+    store.commit("onLoadingStateChanged", false);
+  });
 });
 
 export default router;
