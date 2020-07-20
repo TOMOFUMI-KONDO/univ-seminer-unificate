@@ -1,0 +1,171 @@
+<template>
+  <div
+    v-if="isShow"
+    class="event card border-info mb-5 mx-0"
+    :id="this.summary"
+  >
+    <p v-b-tooltip="this.summary" class="card-header bg-info font-weight-bold">
+      <a :href="this.html_link" class="text-light" target="_blank">{{
+        this.short_summary
+      }}</a>
+    </p>
+    <div class="card-body">
+      <b-list-group class="font-weight-normal text-left">
+        <small class="pb-3"
+          ><u>{{ this.date }}{{ this.time }}</u></small
+        >
+        <!--            todo:URLをaタグで囲うようにする？セキュリティは？-->
+        <p v-html="description" class="mb-0"></p>
+        <div class="delete d-flex justify-content-end mt-3">
+          <b-button
+            @click="deleteEvent(eventId)"
+            variant="outline-danger"
+            size="sm"
+            >イベントを削除する</b-button
+          >
+        </div>
+      </b-list-group>
+    </div>
+  </div>
+</template>
+
+<script>
+import moment from "moment";
+import axios from "axios";
+
+export default {
+  name: "EventOnManage",
+  //親コンポーネントで:event-data="~~~"で与えられるデータ
+  props: ["eventData"],
+  data() {
+    return {
+      summary: "",
+      short_summary: "",
+      max_summary: 15, //タイトルの文字数上限。一行に収まるように。
+      description: "",
+      max_description: 100, //説明文の文字数上限
+      date: "",
+      time: "",
+      html_link: "",
+      eventId: "",
+      deleteUrl:
+        "https://asia-northeast1-univ-seminer-unificate.cloudfunctions.net/deleteEventOnCalendar", //firebase cloud functionのURL
+      isShow: true,
+    };
+  },
+  computed: {
+    userEmail() {
+      const userStatus = this.$store.getters.userStatus;
+      if (userStatus) {
+        return userStatus.email;
+      }
+      return "";
+    },
+  },
+  methods: {
+    setValue(val) {
+      //tooltipで表示するように元のタイトルを取っておく
+      let summary = val.summary;
+      summary = summary.replace(/^【Web(開催|配信)(\/(学内限定|PDP))?】/, "");
+      this.summary = summary;
+
+      //タイトルがthis.max_summaryの値より長かったら途中で切る。
+      if (val.summary.length > this.max_summary) {
+        this.short_summary = summary.substring(0, this.max_summary) + "...";
+      } else {
+        this.short_summary = summary;
+      }
+
+      let description = val.description;
+      if (description) {
+        description = val.description.substring(0, this.max_description);
+        //urlをaタグに変更
+        this.description = description.replace(
+          /(http(s)?:\/\/[-_.!~*'()a-zA-Z0-9;/?:@&=+$,%#]+)/,
+          '<a href="$1" target="_blank">$1</a>'
+        );
+      }
+      //文字数が150文字より多ければ切り取る。
+
+      if ("dateTime" in val.start) {
+        let dateTime = val.start.dateTime;
+        this.date = this.getDate(dateTime);
+        this.time = this.getTime(dateTime);
+      }
+      //終日イベントの場合
+      else {
+        let date = val.start.date;
+        this.date = this.getDate(date);
+      }
+
+      this.html_link = val.htmlLink;
+      this.eventId = val.id;
+    },
+    getDate(datetime) {
+      return moment(datetime).format("YYYY/MM/DD");
+    },
+    getTime(datetime) {
+      return moment(datetime).format("　HH:mm~");
+    },
+    async deleteEvent(eventId) {
+      //管理者ユーザーでログインしている確認
+      if (this.userEmail === "root@tohoku.univ.seminer") {
+        this.isShow = false;
+
+        //firebase cloud functionの関数を発火
+        let params = new URLSearchParams();
+        params.append("eventId", eventId);
+        await axios.post(this.deleteUrl, params).then((response) => {
+          console.log(response.data.message);
+        });
+      } else {
+        alert(
+          "管理者ユーザーでログインされていません。\nもう一度ログインしなおしてください。"
+        );
+      }
+    },
+  },
+  created() {
+    this.setValue(this.eventData);
+  },
+};
+</script>
+
+<style scoped lang="scss">
+.event {
+  @media (min-width: 576px) {
+    flex: 0 50%;
+    max-width: 45%;
+  }
+
+  @media (min-width: 918px) {
+    flex: 0 33%;
+    max-width: 30%;
+  }
+
+  .delete {
+    button {
+      width: 150px;
+      font-size: 14px;
+    }
+  }
+
+  .modal-wrapper {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 10;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.25);
+    opacity: 0.1;
+
+    .modal {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+    }
+  }
+}
+</style>

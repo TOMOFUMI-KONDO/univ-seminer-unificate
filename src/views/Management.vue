@@ -1,12 +1,11 @@
 <template>
   <div class="events px-lg-5 px-4">
-    <p class="text-left">登録済みのイベントを削除することができます。</p>
-    <button @click="remove(tmp)">delete</button>
+    <p class="text-left mb-5">登録済みのイベントを削除することができます。</p>
     <b-card-group deck>
-      <Event
+      <EventOnManage
         :event-data="event"
         v-for="event in eventData"
-        :key="event.summary"
+        :key="event.id"
       />
     </b-card-group>
     <p class="text-right font-weight-bold">
@@ -21,84 +20,51 @@
 </template>
 
 <script>
-import Event from "../components/Event.vue";
+import EventOnManage from "../components/EventOnManage";
 
 export default {
-  name: "Events",
-  components: { Event },
+  name: "Management",
+  components: { EventOnManage },
   data() {
     return {
       eventData: [], //全てのイベントデータ
       calendarUrl: "https://www.googleapis.com/calendar/v3/calendars/",
       calendarId: this.$calendarId,
       apiKey: process.env.VUE_APP_CALENDAR_API_KEY,
-      tmp: "2r5apt3s261dpam5l7jkc6ui1k",
     };
   },
   methods: {
-    //google calendar apiを読み込む
-    load(method, eventId = null) {
-      window.gapi.load("client", () => this.init(method, eventId));
+    load() {
+      window.gapi.load("client", this.init);
     },
-    //google calendar apiを利用してイベント情報を取得する
-    init(method, eventId) {
+    //gapiの初期化・認証
+    init() {
       window.gapi.client
         .init({
           apiKey: this.apiKey,
-          // clientId:
-          //   "1043408526545-l8rn9a0b8qe07hq5hq20u8gp9fden1ai.apps.googleusercontent.com",
-          // discoveryDocs: [
-          //   "https://www.googleapis.com/discovery/v1/apis/calendar/v3/rest",
-          // ],
-          // scope: "https://www.googleapis.com/auth/calendar",
         })
         .then(() => {
-          console.log(
-            this.calendarUrl +
+          return window.gapi.client.request({
+            path:
+              this.calendarUrl +
               encodeURIComponent(this.calendarId) +
-              "/events" +
-              (method === "delete" ? `/${eventId}` : "")
-          );
-          console.log(method.toUpperCase());
-          if (method === "get") {
-            return window.gapi.client.request({
-              path:
-                this.calendarUrl +
-                encodeURIComponent(this.calendarId) +
-                "/events",
-            });
-          } else {
-            return window.gapi.client.request({
-              path:
-                this.calendarUrl +
-                encodeURIComponent(this.calendarId) +
-                "/events" +
-                `/${eventId}`,
-              method: method.toUpperCase(),
-            });
-          }
+              "/events",
+          });
         })
         .then((response) => {
-          if (method === "get") {
-            const items = response.result.items;
+          const items = response.result.items;
 
-            for (let i = 0; i < items.length; i++) {
-              this.eventData.push(items[i]);
-            }
-          } else {
-            console.log(response);
+          for (let i = 0; i < items.length; i++) {
+            this.eventData.push(items[i]);
           }
         })
         .catch((e) => {
           console.log(e);
         });
     },
-    remove(eventId) {
-      this.load("delete", eventId);
-    },
   },
   created() {
-    this.load("get");
+    this.load();
   },
 };
 </script>
