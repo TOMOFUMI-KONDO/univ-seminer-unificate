@@ -1,12 +1,12 @@
 <template>
   <header class="mb-5 pt-4 pb-lg-4 pb-2">
     <b-navbar toggleable="lg" type="dark" class="justify-content-around">
-      <h1 class="mb-0">東北大学セミナー情報</h1>
+      <h1 class="mb-0">{{$t('title')}}</h1>
       <b-navbar-toggle target="nav-collapse" class="border-0" />
       <b-collapse id="nav-collapse" class="flex-grow-0" is-nav>
-        <router-link to="/">イベントカレンダー</router-link>
-        <router-link to="/events">イベント詳細</router-link>
-        <router-link to="/archive">過去のイベント</router-link>
+        <router-link to="/">{{$t('eventcalendar')}}</router-link>
+        <router-link to="/events">{{$t('eventdetails')}}</router-link>
+        <router-link to="/archive">{{$t('pastevents')}}</router-link>
         <auth />
       </b-collapse>
     </b-navbar>
