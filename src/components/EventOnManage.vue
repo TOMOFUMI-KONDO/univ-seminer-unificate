@@ -1,7 +1,11 @@
 <template>
-  <div class="event card border-info mb-5 mx-0" :id="this.summary">
+  <div
+    v-if="isShow"
+    class="event card border-info mb-5 mx-0"
+    :id="this.summary"
+  >
     <p v-b-tooltip="this.summary" class="card-header bg-info font-weight-bold">
-      <a :href="this.html_link" class="text-light" target="_blank" v-on:click="count(summary)">{{
+      <a :href="this.html_link" class="text-light" target="_blank">{{
         this.short_summary
       }}</a>
     </p>
@@ -12,6 +16,14 @@
         >
         <!--            todo:URLをaタグで囲うようにする？セキュリティは？-->
         <p v-html="description" class="mb-0"></p>
+        <div class="delete d-flex justify-content-end mt-3">
+          <b-button
+            @click="deleteEvent(eventId)"
+            variant="outline-danger"
+            size="sm"
+            >イベントを削除する</b-button
+          >
+        </div>
       </b-list-group>
     </div>
   </div>
@@ -19,13 +31,12 @@
 
 <script>
 import moment from "moment";
-import firebase from "firebase";
-import "firebase/firestore"
-
+import axios from "axios";
 
 export default {
-  name: "Event",
-  props: ["eventData"], //親コンポーネントで:event-data="~~~"で与えられるデータ
+  name: "EventOnManage",
+  //親コンポーネントで:event-data="~~~"で与えられるデータ
+  props: ["eventData"],
   data() {
     return {
       summary: "",
@@ -36,7 +47,20 @@ export default {
       date: "",
       time: "",
       html_link: "",
+      eventId: "",
+      deleteUrl:
+        "https://asia-northeast1-univ-seminer-unificate.cloudfunctions.net/deleteEventOnCalendar", //firebase cloud functionのURL
+      isShow: true,
     };
+  },
+  computed: {
+    userEmail() {
+      const userStatus = this.$store.getters.userStatus;
+      if (userStatus) {
+        return userStatus.email;
+      }
+      return "";
+    },
   },
   methods: {
     setValue(val) {
@@ -75,6 +99,7 @@ export default {
       }
 
       this.html_link = val.htmlLink;
+      this.eventId = val.id;
     },
     getDate(datetime) {
       return moment(datetime).format("YYYY/MM/DD");
@@ -82,31 +107,23 @@ export default {
     getTime(datetime) {
       return moment(datetime).format("　HH:mm~");
     },
-    //クリック数をfirebaseに保存する関数
-    count: function (message) {
-      const db = firebase.firestore();
-      let event_cnt = db.collection("events").doc(this.replace(message))
-      event_cnt.update({
-        viewed: firebase.firestore.FieldValue.increment(1)
-      })
-      //firebaseにイベントが存在しない場合、新たにセットする
-      .catch(e => {
-        event_cnt.set(this.eventData)
-        event_cnt.update({
-        viewed: firebase.firestore.FieldValue.increment(1)
-        })
-        console.log(e)
-      })
+    async deleteEvent(eventId) {
+      //管理者ユーザーでログインしている確認
+      if (this.userEmail === "root@tohoku.univ.seminer") {
+        this.isShow = false;
+
+        //firebase cloud functionの関数を発火
+        let params = new URLSearchParams();
+        params.append("eventId", eventId);
+        await axios.post(this.deleteUrl, params).then((response) => {
+          console.log(response.data.message);
+        });
+      } else {
+        alert(
+          "管理者ユーザーでログインされていません。\nもう一度ログインしなおしてください。"
+        );
+      }
     },
-    //文字列からスラッシュを除去する関数
-    //firebaseのドキュメント名にイベント名を使用しているが
-    //スラッシュはドキュメント名に使用できないためこの関数を使用している
-    replace: function(message){
-      let before = message;
-      let after = "";
-      after = before.replace( /\//g , "" ) ;
-      return after;
-    }
   },
   created() {
     this.setValue(this.eventData);
@@ -124,6 +141,31 @@ export default {
   @media (min-width: 918px) {
     flex: 0 33%;
     max-width: 30%;
+  }
+
+  .delete {
+    button {
+      width: 150px;
+      font-size: 14px;
+    }
+  }
+
+  .modal-wrapper {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 10;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.25);
+    opacity: 0.1;
+
+    .modal {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+    }
   }
 }
 </style>

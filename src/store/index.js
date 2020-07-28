@@ -1,29 +1,29 @@
-import Vue from 'vue'
-import Vuex from 'vuex'
+import Vue from "vue";
+import Vuex from "vuex";
 
-Vue.use(Vuex)
+Vue.use(Vuex);
 
 const store = new Vuex.Store({
-    state: {
-        status: false,
-        loading: false
+  state: {
+    status: "",
+    loading: false,
+  },
+  mutations: {
+    onUserStatusChanged(state, status) {
+      state.status = status;
     },
-    mutations: {
-        onUserStatusChanged(state, status) {
-            state.status = status
-        },
-        onLoadingStateChanged(state, loadingState) {
-            state.loading = loadingState
-        }
+    onLoadingStateChanged(state, loadingState) {
+      state.loading = loadingState;
     },
-    getters: {
-        isSignIn(state) {
-            return state.status
-        },
-        isLoading(state) {
-            return state.loading
-        }
-    }
-})
+  },
+  getters: {
+    userStatus(state) {
+      return state.status;
+    },
+    isLoading(state) {
+      return state.loading;
+    },
+  },
+});
 
-export default store
+export default store;

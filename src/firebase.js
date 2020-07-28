@@ -2,7 +2,6 @@ import firebase from "firebase/app";
 import "firebase/auth";
 import "firebase/analytics"
 import "firebase/firestore"
-import store from "./store";
 import router from "./router";
 
 // todo: 環境変数に記述する
@@ -26,36 +25,38 @@ export default {
             })
         firebase.analytics();
     },
-    login(domain) {
+    login() {
         const provider = new firebase.auth.GoogleAuthProvider()
         provider.setCustomParameters({
-            hd: `${domain}.ac.jp`, //このドメインのみでログイン可（dc.tohoku.ac.jpはこれのサブドメインなのでログイン可）
+            hd: "tohoku.ac.jp", //このドメインのみでログイン可（dc.tohoku.ac.jpはこれのサブドメインなのでログイン可）
         })
 
         firebase.auth().signInWithPopup(provider)
-            .then(() => {
-                router.push('/').then()
-            })
             .catch(e => {
+                alert(e.message);
                 console.log(e)
-                this.errorMessage = e.message
-                this.ifError = true
             })
+    },
+    manageLogin(password) {
+      firebase
+        .auth()
+        .signInWithEmailAndPassword("root@tohoku.univ.seminer", password)
+        .catch((e) => {
+          const errorCode = e.code;
+          const errorMessage = e.message;
+          if (errorCode === "auth/wrong-password") {
+            alert("Wrong password...");
+          } else {
+            alert(errorMessage);
+          }
+          console.log(e);
+        });
     },
     logout() {
         firebase.auth().signOut()
-            .then(() => {
-                router.push('sign-in').then()
-            })
             .catch(e => {
                 console.log(e)
                 router.push('sign-in').then()
             })
     },
-    onAuth() {
-        firebase.auth().onAuthStateChanged(user => {
-            user = user ? user : {};
-            store.commit('onUserStatusChanged', !!user.uid);
-        });
-    }
 };

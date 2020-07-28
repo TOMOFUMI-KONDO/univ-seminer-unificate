@@ -1,5 +1,5 @@
 <template>
-  <header class="mb-5 pt-4 pb-lg-4 pb-2">
+  <header class="mb-5 pt-4 pb-lg-4 pb-2" :class="isSignIn && 'sign-in'">
     <b-navbar toggleable="lg" type="dark" class="justify-content-around">
       <h1 class="mb-0">東北大学セミナー情報</h1>
       <b-navbar-toggle target="nav-collapse" class="border-0" />
@@ -19,16 +19,32 @@ import Auth from "./Auth";
 export default {
   name: "Header",
   components: { Auth },
+  computed: {
+    //サインイン時に余白の大きさを変更するために使う
+    isSignIn() {
+      return this.$store.getters.userStatus;
+    },
+  },
 };
 </script>
 
-<!-- Add "scoped" attribute to limit CSS to this component only -->
 <style lang="scss">
 header {
   background-color: #220c4c;
   color: #fafafa;
 
+  &.sign-in {
+    @media (min-width: 992px) {
+      padding-top: 0 !important;
+      padding-bottom: 5px !important;
+    }
+  }
+
   h1 {
+    @media (max-width: 1100px) {
+      font-size: 30px;
+    }
+
     @media (max-width: 991px) {
       padding-bottom: 10px;
     }
